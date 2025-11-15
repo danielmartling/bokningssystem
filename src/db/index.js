@@ -4,14 +4,9 @@ const sequelize = require("./config");
 // Importera models:
 const Group = require("./models/Group")(sequelize);
 const GroupType = require("./models/GroupType")(sequelize);
-const GroupGroupType = require("./models/GroupGroupType")(sequelize);
 
-const models = {
-    Group, GroupType, GroupGroupType
-};
-
-Group.associate(models);
-GroupType.associate(models);
+Group.belongsToMany(GroupType, { through: { model: "GroupGroupTypes", timestamps: false }, foreignKey: "group_id", otherKey: "type_id" });
+GroupType.belongsToMany(Group, { through: { model: "GroupGroupTypes", timestamps: false }, foreignKey: "type_id", otherKey: "group_id" });
 
 async function initDatabase() {
     try {
@@ -27,6 +22,8 @@ async function initDatabase() {
 
 module.exports = {
     sequelize,
-    models,
+    models: {
+        Group, GroupType
+    },
     initDatabase,
 };
