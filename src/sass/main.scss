@@ -1,0 +1,53 @@
+// Egna färgdefinitioner
+$terrakotta: #E35336;
+$petrolblå: #0C5678;
+$petrolgrön: #005F6A;
+$scoutblå: #003660;
+
+$bäverblå: #652483;
+$spårargrön: #41a62a;
+$upptäckarblå: #00a8e1;
+$upptäckarblå-invert: white;
+$äventyrarorange: #e95f13;
+$utmanarrosa: #da005e;
+$rovergul: #e2e000;
+$roverkomplement: #837a02;
+
+$babord: #ff0000;
+$babord-invert: black;
+$styrbord: #00B300;
+$styrbord-invert: black;
+
+$family-sans-serif: "Helvetica", "Arial", sans-serif;
+
+@use "bulma/sass" with ($control-border-width: 2px,
+    $input-shadow: none,
+    $family-primary: $family-sans-serif,
+
+    // Omdefinierade färger
+    $primary: ($petrolgrön, white),
+    $blue: $scoutblå,
+    $code: $utmanarrosa,
+    $success: ($spårargrön, black),
+    $link: ($scoutblå, white),
+    $danger: ($babord, $babord-invert),
+    $info: ($upptäckarblå, $upptäckarblå-invert),
+    $warning: ($rovergul, black),
+
+    // Egna färger (skapar css-klasser eg. is-staff)
+    $custom-colors: ("primary-staff": ($terrakotta, black),
+        "secondary-staff": ($petrolgrön, white),
+        "primary-guest": ($petrolgrön, white),
+        "secondary-guest": ($petrolblå, white),
+        "secondary": ($terrakotta, black),
+        "bav": ($bäverblå, white),
+        "spar": ($spårargrön, black),
+        "upp": ($upptäckarblå, white),
+        "aven": ($äventyrarorange, black),
+        "utm": ($utmanarrosa, white),
+        "rov": ($rovergul, black),
+        "babord": ($babord, black),
+        "styrbord": ($styrbord, black),
+        "guest": ($petrolgrön, white),
+        "staff": ($terrakotta, black),
+        "fladan": ($scoutblå, white)));

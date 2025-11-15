@@ -1,0 +1,9 @@
+# .gitignore
+
+# Mycket viktigt:
+.env
+
+node_modules
+public/css/main.css.map
+.DS_Store
+_old
