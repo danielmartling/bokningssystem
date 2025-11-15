@@ -22,7 +22,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use('/img', express.static(path.join(__dirname, 'resources/img')));
 app.use('/icons', express.static(path.join(__dirname, 'resources/icons')));
 app.use('/templates', express.static(path.join(__dirname, 'resources/templates')));
-app.use('/docs', express.static(path.join(__dirname, 'public/docs')));
+app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));

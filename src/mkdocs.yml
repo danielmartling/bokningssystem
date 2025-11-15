@@ -1,7 +1,7 @@
 site_name: Bokningssystem Docs
 
 docs_dir: ./docs
-site_dir: ../public/docs
+site_dir: ../docs
 
 nav:
   - Home: index.md
