@@ -50,9 +50,11 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#bulma">Bulma</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#postgres">Postgres</a>
+    <li class="toctree-l2"><a class="reference internal" href="#dotenv-env">Dotenv (.env)</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#npm">NPM</a>
+    <li class="toctree-l2"><a class="reference internal" href="#databas-postgres-sequelize">Databas: Postgres + Sequelize</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#npm-och-nodejs">NPM och node.js</a>
     </li>
     </ul>
                 </li>
@@ -90,8 +92,27 @@
 <p><strong>Ändra bulma:</strong> Redigera filen <code>/src/sass/main.scss</code>.</p>
 <p><strong>Bygg bulma:</strong> Görs ändringar måste bulma kompileras. Kör <code>npm run build-bulma</code> i <code>/</code>. Då uppdateras <code>/public/css/main.css</code>. Kom ihåg att inkludera den i html-filer (till exempel <code>&lt;link rel="stylesheet" href="css/main.css"&gt;</code>).</p>
 <p><a href="https://bulma.io/documentation/customize/with-sass/">Mer info om bulma.</a></p>
-<h2 id="postgres">Postgres</h2>
-<h2 id="npm">NPM</h2>
+<h2 id="dotenv-env">Dotenv (<code>.env</code>)</h2>
+<p>Hemligheter såsom användarnamn, lösenord och adresser lagras i en fil som heter <code>.env</code>. Den måste skapas separat och ska absolut inte skickas upp till github (den ligger med i <code>.gitignore</code>). Här är en mall:</p>
+<pre><code># .env
+DB_USER=&quot;username&quot;
+DB_HOST=&quot;localhost&quot;
+DB_NAME=&quot;booking_dev&quot;
+DB_PASSWORD=&quot;password&quot;
+DB_PORT=&quot;5432&quot;
+COOKIE_SECRET=&quot;password&quot;
+PORT=&quot;3000&quot;
+</code></pre>
+<h2 id="databas-postgres-sequelize">Databas: Postgres + Sequelize</h2>
+<ul>
+<li>Databastabeller ("models") definieras i <code>src/db/models/</code>.</li>
+<li>Controllers bestämmer hur backenden interagerar med databasobjekten (<code>src/db/controllers/</code>).</li>
+<li>Routes låter användaren begära tillgång till databasobjekt (<code>src/db/routes/</code>).</li>
+<li>Till sist kallar användaren på databasobjekten från någon av metoderna i <code>public/js/api/</code>. </li>
+<li></li>
+</ul>
+<h2 id="npm-och-nodejs">NPM och node.js</h2>
+<p>Filen <code>package.json</code> innehåller dependencies som installeras med <code>npm install</code>. (Kräver <code>sudo apt install nodejs npm</code>). Starta webappen med <code>node server.js</code>.</p>
               
             </div>
           </div><footer>
