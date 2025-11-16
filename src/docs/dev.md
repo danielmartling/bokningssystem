@@ -37,9 +37,9 @@ PORT="3000"
 
 - Databastabeller ("models") definieras i `src/db/models/`.
 - Controllers bestämmer hur backenden interagerar med databasobjekten (`src/db/controllers/`).
-- Routes låter användaren begära tillgång till databasobjekt (`src/db/routes/`).
+- Routes låter användaren begära tillgång till databasobjekt (`src/db/routes/`). 
 - Till sist kallar användaren på databasobjekten från någon av metoderna i `public/js/api/`. 
-- 
+
 ## NPM och node.js
 
 Filen `package.json` innehåller dependencies som installeras med `npm install`. (Kräver `sudo apt install nodejs npm`). Starta webappen med `node server.js`.
