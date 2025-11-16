@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const Troop = sequelize.define(
-        "Troop",
+        "troop",
         {
             troop_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
             troop_name: { type: DataTypes.STRING, allowNull: false },

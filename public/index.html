@@ -12,8 +12,77 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 
-    <script src="js/api/index.js"></script>
+    <script type="module" src="js/api/index.js"></script>
 </head>
+
+<style>
+    #interval-control .field.has-addons {
+        margin-bottom: 0px;
+    }
+
+    #groupsList .columns:last-child {
+        border-bottom: none !important;
+    }
+
+    #grouplist .field.is-horizontal {
+        padding-bottom: 0.5em;
+    }
+
+    #grouplist .field.is-horizontal:last-child {
+        border-bottom: none;
+    }
+
+    .groups-list {
+        min-width: 600px;
+        padding-left: 1.5em;
+        padding-right: 1.5em;
+        padding-top: 1.5em;
+    }
+
+    .groups-list .columns {
+        min-width: 100%;
+    }
+
+    .groups-list .columns .column {
+        padding-left: 0.75em;
+        /* padding-right: 0.75em; */
+        min-width: 100px;
+        border-bottom: 1px solid #9d9d9d8a;
+        height: 60px;
+    }
+
+    .groups-list {
+        overflow-x: scroll;
+        overflow-y: hidden;
+        width: 100%;
+    }
+
+    .column {
+        max-width: 100vw;
+    }
+
+    .col-booking-number {
+        flex: 0 0 80px;
+        min-width: 80px !important;
+        text-align: left;
+        padding-right: 0.5em;
+    }
+
+    .col-arrival_date,
+    .col-departure_date {
+        min-width: 150px !important;
+    }
+
+    .col-name {
+        min-width: 250px !important;
+    }
+
+    .col-particiants,
+    .col-type,
+    .col-buttons {
+        min-width: 150px !important;
+    }
+</style>
 
 <body>
     <div class="container">
@@ -25,10 +94,95 @@
                     Provisorisk landningssida.
                 </p>
             </div>
+            <div class="table-container">
+                <table id="groupsList" class="table"></table>
+            </div>
         </div>
     </div>
 </body>
 
 <script>
+    let groups = [];
 
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+    });
+
+    async function init() {
+        groups = await api.getAllGroups();
+        console.log(groups);
+
+        renderGroupTable();
+    }
+
+    function getIcon(hej) {
+        return "";
+    }
+
+    function renderGroupTable() {
+        const groupsList = document.getElementById('groupsList');
+
+        const header = document.createElement("div");
+        header.classList.add("columns", "is-mobile", "is-vcentered", "has-text-weight-bold");
+        header.style.border = "1.5px solid #9d9d9d8a;";
+        header.innerHTML = `
+            <div class="column is-clickable col-booking-number"
+                title="Sort by booking number">
+                ${getIcon("booking_number")}&nbsp;#
+            </div>
+            <div class="column is-clickable col-name"
+                title="Sort by group name">
+                ${getIcon("name")}&nbsp;Group name
+            </div>
+            <div class="column col-type">Type</div>
+            <div class="column is-clickable col-arrival_date"
+                title="Sort by arrival date">
+                ${getIcon("arrival_date")}&nbsp;Arrival
+            </div>
+            <div class="column is-clickable col-departure_date"
+                title="Sort by departure date">
+                ${getIcon("departure_date")}&nbsp;Departure
+            </div>
+            <div class="column col-participants">Participants</div>
+            <div class="column col-buttons">&nbsp;</div>
+        `;
+        groupsList.appendChild(header);
+
+        groups.forEach(group => {
+            const row = document.createElement('div');
+            row.className = 'columns is-mobile is-vcentered group-row';
+            row.style.cursor = "pointer";
+            row.innerHTML = `
+                <div class="column col-booking-number">${group.booking_number}</div>
+                <div class="column col-name">${group.group_name}</div>
+                <div class="column col-type">${group.GroupTypes.length}</div>
+                <div class="column col-arrival_date">${group.arrival_date || ''}</div>
+                <div class="column col-departure_date">${group.departure_date || ''}</div>
+                <div class="column col-participants">${group.Troops.length}</div>
+                <div class="column col-buttons">
+                    <div class="buttons">
+                        <button id="scheduleButton" class="button">
+                            <span class="iconify" data-icon="mdi-calendar-month"></span>
+                        </button>
+                        <button id="historyButton" class="button">
+                            <span class="iconify" data-icon="mdi-history"></span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            row.addEventListener("click", (e) => {
+                const scheduleButton = e.target.closest("#scheduleButton");
+                const historyButton = e.target.closest("#historyButton");
+                if (scheduleButton) {
+                    window.location = `./bookings.html?booking_number=${group.booking_number}`;
+                } else if (historyButton) {
+                    window.location = `./history.html?booking_number=${group.booking_number}`;
+                } else {
+                    window.location = `./view.html?booking_number=${group.booking_number}`;
+                }
+            });
+            groupsList.appendChild(row);
+        });
+
+    }
 </script>

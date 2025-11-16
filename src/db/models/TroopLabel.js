@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const TroopLabel = sequelize.define(
-        "TroopLabel",
+        "troop_type",
         {
             label: { type: DataTypes.STRING },
             description: { type: DataTypes.STRING }
