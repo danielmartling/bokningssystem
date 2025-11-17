@@ -2,9 +2,10 @@
 const express = require("express");
 const router = express.Router();
 const groupsController = require('../controllers/groupsController');
+const { requireLogin, requireRoles } = require('../../middleware/auth');
 
-router.get('/', groupsController.getAllGroups);
-router.get("/byday/:day", groupsController.getGroupsByDay);
-router.post('/', groupsController.createGroup);
+router.get('/', requireLogin, requireRoles(["staff", "system-admin"]), groupsController.getAllGroups);
+router.get("/byday/:day", requireLogin, requireRoles(["staff", "system-admin"]), groupsController.getGroupsByDay);
+router.post('/', requireLogin, requireRoles(["system-admin", "program-admin", "program-booker"]), groupsController.createGroup);
 
 module.exports = router;

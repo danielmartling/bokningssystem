@@ -31,14 +31,18 @@ DB_PASSWORD="password"
 DB_PORT="5432"
 COOKIE_SECRET="password"
 PORT="3000"
+WEBAPP_ADMIN="username"
+WEBAPP_ADMIN_PASSWORD="password"
 ```
 
 ## Databas: Postgres + Sequelize
 
+När `node server.js` så skapas alla databastabeller automatiskt om de inte finns. Det skapas även en administratörsanvändare vars användarnamn och lösenord definieras i `.env`.
+
 - Databastabeller ("models") definieras i `src/db/models/`.
 - Controllers bestämmer hur backenden interagerar med databasobjekten (`src/db/controllers/`).
 - Routes låter användaren begära tillgång till databasobjekt (`src/db/routes/`). 
-- Till sist kallar användaren på databasobjekten från någon av metoderna i `public/js/api/`. 
+- Till sist kallar användaren på databasobjekten från någon av metoderna i `public/js/api/`.
 
 ## NPM och node.js
 
