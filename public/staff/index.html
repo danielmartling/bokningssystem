@@ -3,28 +3,165 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="/icons/hollyrosa-square.png">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bokningssystem</title>
+    <title>Anna Bookning - Home</title>
 
     <link rel="stylesheet" href="/css/main.css">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 
     <script type="module" src="/js/api/index.js"></script>
+    <script src="/js/dateHelpers.js"></script>
+
+    <script src="/js/scripts.js"></script>
+    <!-- <script src="../js/groups.js"></script> -->
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
+        aria-label="main navigation">
+    </nav>
+
     <div class="container">
-        <div class="section">
-            <div class="content">
-                <p class="title is-1">Bokningssystem</p>
-                <p class="subtitle is-3">Program booking system</p>
-                <p>
-                    Provisorisk sida.
-                </p>
+        <div class="section" style="--bulma-section-padding: 3rem 0rem;">
+            <div class="container" id="notification-container"></div>
+
+            <div class="notification is-light is-primary-staff" style="margin-bottom: 20px; border-radius: 20px;">
+                <div class="content">
+                    <h1 class="title">Program - Home</h1>
+                </div>
+                <div class="box">
+                    <div class="content">
+                        <p id="dayTitle" class="subtitle is-3"></p>
+                        <p id="dayMessage"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns">
+                <div class="column is-two-thirds">
+                    <div class="box">
+                        <div class="content">
+                            <p class="subtitle is-3">Bookings today <button class="button" id="allToggle">All?</button>
+                            </p>
+                            <div class="table-container">
+                                <table
+                                    class="table is-fullwidth is-hoverable is-bordered is-striped has-sticky-header has-sticky-column">
+                                    <thead id="activitiesTable"></thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="content">
+                            <p class="subtitle is-3">On island today</p>
+                            <ul id="groupsTodayList"></ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <footer class="footer" id="common-footer"></footer>
+
 </body>
+
+<script>
+
+    let all = false;
+
+    document.getElementById("allToggle").addEventListener("click", () => {
+        document.getElementById("activitiesTable").innerHTML = "";
+        all = !all;
+        init();
+    })
+    document.addEventListener('DOMContentLoaded', () => {
+        initHTML();
+
+        init();
+    });
+
+    async function init() {
+
+        const today = todayString();
+
+        const dayTitle = document.getElementById("dayTitle");
+        const dayMessage = document.getElementById("dayMessage");
+        [dayTitle.innerHTML, dayMessage.innerHTML] = await renderDayMessage(today);
+
+        groupsTodayList = document.getElementById("groupsTodayList");
+        groupsTodayList.innerHTML = await renderGroupsToday(today);
+
+        // bookingsToday = all ? await api.getTodaysBookings() : await api.getTodaysBookingsProgram();
+        bookingsToday = [];
+        activitiesTable = document.getElementById("activitiesTable");
+
+        // console.log(bookingsToday);
+
+        if (bookingsToday.length === 0) {
+            activitiesTable.innerHTML = `
+                <tr>
+                    <th colspan = "3"><i>No bookings today...</i></th>
+                </tr>
+            `;
+        } else {
+            bookingsToday.forEach(booking => {
+                activitiesTable.innerHTML += `
+                <tr>
+                    <th>${booking.activity_name}</th>
+                    <th>${booking.group_name}</th>
+                    <td>${renderShift(booking.shift)}</td>
+                </tr>
+            `;
+            })
+        }
+
+    }
+
+    // function renderShift(shift) {
+    //     switch (shift) { case 0: return "FM"; break; case 1: return "EM"; break; case 2: return "KV"; break; case 3: return "Natt"; break; };
+    // }
+
+    async function renderDayMessage(day) {
+        // Todo
+        return [todayString() + ":&nbsp;" + "Title of day eg. Miniscout day 4", "Important message of the day, eg. group arrives, need 25 tents."];
+    }
+
+    async function renderGroupsToday(day) {
+        const groupsToday = await api.getGroupsByDay(day);
+        let groupsArrivingHtml = "";
+        let groupsStayingHtml = "";
+        let groupsDepartingHtml = "";
+
+        if (groupsToday.length == 0) {
+            return `<i>No groups today...</i>`;
+        } else {
+            groupsToday
+                .sort((a, b) => a.group_name.localeCompare(b.group_name, "sv"))
+                .forEach(group => {
+                    if (group.arrival_date === day) {
+                        groupsArrivingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                    } else if (group.departure_date === day) {
+                        groupsDepartingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                    } else {
+                        groupsStayingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                    }
+                });
+            const groupsTodayHtml = `
+            ${groupsArrivingHtml == "" ? "" : "<p class='subtitle is-5'>Arriving</p><ul>" + groupsArrivingHtml + "</ul>"}
+            ${groupsStayingHtml == "" ? "" : "<p class='subtitle is-5'>Staying</p><ul>" + groupsStayingHtml + "</ul>"}
+            ${groupsDepartingHtml == "" ? "" : "<p class='subtitle is-5'>Leaving</p><ul>" + groupsDepartingHtml + "</ul>"}`;
+            return groupsTodayHtml;
+        }
+    }
+
+
+</script>
+
+</html>

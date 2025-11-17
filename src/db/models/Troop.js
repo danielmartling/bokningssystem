@@ -16,10 +16,8 @@ module.exports = (sequelize) => {
     );
 
     Troop.associate = (models) => {
-        Troop.belongsToMany(models.TroopLabel, {
-            through: models.TroopTroopLabel,
-            foreignKey: "label",
-        });
+        Troop.belongsTo(models.TroopLabel, { foreignKey: "label_id" });
+        Troop.belongsTo(models.Group, { foreignKey: "group_id" });
     };
 
     return Troop;

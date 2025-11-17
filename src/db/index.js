@@ -5,9 +5,6 @@ const sequelize = require("./config");
 const Group = require("./models/Group")(sequelize);
 const GroupType = require("./models/GroupType")(sequelize);
 
-Group.belongsToMany(GroupType, { through: { model: "GroupGroupTypes", timestamps: false }, foreignKey: "group_id", otherKey: "type_id" });
-GroupType.belongsToMany(Group, { through: { model: "GroupGroupTypes", timestamps: false }, foreignKey: "type_id", otherKey: "group_id" });
-
 const Troop = require("./models/Troop")(sequelize);
 const TroopLabel = require("./models/TroopLabel")(sequelize);
 
@@ -16,6 +13,10 @@ TroopLabel.hasMany(Troop, { foreignKey: "label_id" });
 
 Group.hasMany(Troop, { foreignKey: "group_id" });
 Troop.belongsTo(Group, { foreignKey: "group_id" });
+
+const GroupGroupType = require("./models/GroupGroupType")(sequelize);
+Group.belongsToMany(GroupType, { through: GroupGroupType, foreignKey: "group_id", otherKey: "type_id" });
+GroupType.belongsToMany(Group, { through: GroupGroupType, foreignKey: "type_id", otherKey: "group_id" });
 
 async function initDatabase() {
     try {

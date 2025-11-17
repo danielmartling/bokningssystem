@@ -1,0 +1,96 @@
+<div class="navbar-brand">
+    <a class="navbar-item" href="/">
+        <img src="/icons/vassaro.svg" class="svg-icon"><b>Anna
+            Bookning</b></a>
+    <a role="button" id="navbar-burger" class="navbar-burger" aria-label="menu" aria-expanded="false"
+        onclick="burgerButton('navbar-burger')" style="color: black;">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+    </a>
+</div>
+<div class="navbar-menu" id="navMenu">
+    <div class="navbar-start">
+        <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link" style="vertical-align: middle;" href="/staff/">
+                <img src="/icons/hollyrosa.svg" class="svg-icon">&nbsp;Program
+            </a>
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="/staff/groups/"><span class="iconify navbar-icon"
+                        data-icon="mdi-tent"></span>&nbsp;Groups</a>
+                <a class="navbar-item" href="/staff/bookings/"><span class="iconify navbar-icon"
+                        data-icon="mdi-calendar"></span>&nbsp;Bookings</a>
+                <a class="navbar-item" href="/staff/activities/"><span class="iconify navbar-icon"
+                        data-icon="mdi-hiking"></span>&nbsp;Activities</a>
+            </div>
+        </div>
+        <a class="navbar-item" href="/staff/fladan/"><span class="iconify navbar-icon"
+                data-icon="mdi-sail-boat"></span>&nbsp;Fladan</a>
+
+    </div>
+    <div class="navbar-end">
+        <!-- <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+                <span class="iconify navbar-icon" data-icon="mdi-toolbox"></span>&nbsp;Tools
+            </a>
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="/staff/tools/statistics.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-chart-bar"></span>&nbsp;Statistics
+                </a>
+                <a class="navbar-item" href="/staff/tools/user_warnings.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-account-alert"></span>&nbsp;User warnings
+                </a>
+                <a class="navbar-item" href="/staff/tools/booking_warnings.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-calendar-alert"></span>&nbsp;Booking warnings
+                </a>
+            </div>
+        </div> -->
+        <!-- <div class="navbar-item has-dropdown is-hoverable">
+            <div class="navbar-link" style="cursor: default">
+                <span class="iconify navbar-icon" data-icon="mdi-library"></span>&nbsp;Resources
+            </div>
+            <span class="dropdown-caret" style="cursor: pointer;"><span class="iconify navbar-icon"
+                    data-icon="mdi-chevron-down"></span></span>
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="/trappermapper/">
+                    <span class="iconify navbar-icon" data-icon="mdi-map"></span>&nbsp;Trappermapper</a>
+                <a class="navbar-item" href="/vook/">
+                    <span class="iconify navbar-icon" data-icon="mdi-compass"></span>&nbsp;Orientering
+                </a>
+                <a class="navbar-item" href="/ais/">
+                    <span class="iconify navbar-icon" data-icon="mdi-anchor"></span>&nbsp;AIS
+                </a>
+                <a class="navbar-item" href="/gravlingkartan/">
+                    <span class="iconify navbar-icon" data-icon="mdi-shovel"></span>&nbsp;Grävlingkartan
+                </a>
+            </div>
+        </div> -->
+        <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link" href="/staff/users/me.html" id="username-display">
+                <span class="iconify navbar-icon" data-icon="mdi-user"></span>&nbsp;Me
+            </a>
+            <div class="navbar-dropdown">
+                <a class="navbar-item" href="/staff/users/">
+                    <span class="iconify navbar-icon" data-icon="mdi-account-group"></span>&nbsp;Users
+                </a>
+                <a class="navbar-item" href="/staff/users/roles.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-format-paint"></span>&nbsp;Roles
+                </a>
+                <a class="navbar-item" href="/staff/users/history.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-history"></span>&nbsp;History
+                </a>
+                <!-- <hr class="navbar-divider">
+                <a class="navbar-item" href="/staff/about.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-info"></span>&nbsp;About
+                </a>
+                <a class="navbar-item" href="/staff/help.html">
+                    <span class="iconify navbar-icon" data-icon="mdi-help"></span>&nbsp;Help
+                </a> -->
+            </div>
+        </div>
+        <a class="navbar-item" onclick="logout()" id="logout-link">
+            <span class="iconify navbar-icon" data-icon="mdi-logout"></span>&nbsp;Log out
+        </a>
+    </div>
+</div>

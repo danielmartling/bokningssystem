@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
     const TroopLabel = sequelize.define(
-        "troop_type",
+        "troop_label",
         {
             label: { type: DataTypes.STRING },
             description: { type: DataTypes.STRING }
@@ -12,10 +12,7 @@ module.exports = (sequelize) => {
     );
 
     TroopLabel.associate = (models) => {
-        TroopLabel.belongsToMany(models.Troop, {
-            through: models.TroopTroopLabel,
-            foreignKey: "troop_id",
-        });
+        TroopLabel.hasMany(models.Troop, { foreignKey: "label_id" });
     };
 
     return TroopLabel;
