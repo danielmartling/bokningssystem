@@ -3,28 +3,142 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="/icons/hollyrosa-square.png">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bokningssystem</title>
+    <title>Bokningssystem - Login</title>
 
     <link rel="stylesheet" href="/css/main.css">
+    <script src="/js/scripts.js"></script>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 
-    <script type="module" src="/js/api/index.js"></script>
+    <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 </head>
 
-<body>
-    <div class="container">
+<body class="has-navbar-fixed-top"
+    style="background-image: url('/img/lillgarn.png'); background-repeat: no-repeat; background-size: cover;">
+    <nav id="login-navbar" class="navbar is-fixed-top is-light" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="/icons/hollyrosa.svg" class="svg-icon"><b>Bokningssystem</b>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 600px;">
         <div class="section">
-            <div class="content">
+            <div class="box">
                 <p class="title is-1">Bokningssystem</p>
                 <p class="subtitle is-3">Program booking system</p>
+
+                <div class="container" id="notification-container">
+                    <div id="warning-box" class="notification is-danger is-hidden">
+                        <button class="delete" onclick="hideWarning()"></button>
+                        <span id="warning-message"></span>
+                    </div>
+
+                    <div id="success-box" class="notification is-success is-hidden">
+                        <button class="delete" onclick="hideSuccess()"></button>
+                        <span id="success-message"></span>
+                    </div>
+
+                    <div id="message-box" class="notification is-primary is-hidden">
+                        <button class="delete" onclick="hideMessage()"></button>
+                        <span id="message-message"></span>
+                    </div>
+                </div>
+                <div class="content">
+                    <blockquote>
+                        <p style="margin-bottom: 0px;"><b>Guests:</b></p>
+                        <p>E-mail bokning(at)vassaro.se for help.</p>
+                        <p style="margin-bottom: 0px;"><b>Staff members:</b></p>
+                        <p>Talk to the program patrol leader or Storgårn for help.</p>
+                    </blockquote>
+                </div>
+
+                <form class="notification is-primary" id="login-form">
+                    <div class="field">
+                        <label class="label">
+                            <p class="subtitle is-3">Log in</>
+                        </label>
+                    </div>
+                    <div class="field">
+                        <label class="label">Username or booking number</label>
+                        <div class="control">
+                            <input class="input" type="text" name="username" placeholder="'kjell' or '1234'" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Password</label>
+                        <div class="control">
+                            <input class="input" type="password" name="password" placeholder="******" required>
+                        </div>
+                    </div>
+                    <button class="button is-link" type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <div class="box">
                 <p>
-                    Provisorisk sida.
+                    <span class="iconify" data-icon="mdi-cookie-alert"></span>&nbsp;
+                    We use cookies to make this site work. They are removed when you log out.
+                </p>
+                <p>
+                    <a href="https://github.com/danielmartling/bokningssystem">
+                        <span class="iconify" data-icon="mdi-github"></span>&nbsp;Github
+                    </a>
+                </p>
+                <p>
+                    &copy; <a href="https://github.com/danielmartling/bokningssystem">Contributors</a>
                 </p>
             </div>
         </div>
-    </div>
+    </footer>
+
+
 </body>
+
+<script>
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: form.username.value.trim().toLowerCase(),
+                    password: form.password.value.trim()
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showWarning(data.error || `Server responded with ${response.status}`);
+                return;
+            }
+
+            window.location = "/?message=login";
+        } catch (error) {
+            showWarning("Unexpected error: " + error.message);
+        }
+    });
+
+    message = new URLSearchParams(window.location.search).get("message");
+    if (message == "logout") {
+        showSuccess("You are logged out. Welcome back!");
+    } else {
+        showWarning("To access this site, you have to be logged in...")
+    }
+
+</script>
+
+</html>

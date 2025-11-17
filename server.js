@@ -18,19 +18,39 @@ app.use(bodyParser.json());
 const cookieParser = require('cookie-parser');
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
+// Middleware
+const { roleRedirect } = require('./src/middleware/redirect');
+const { requireLogin, requireRoles } = require('./src/middleware/auth');
+
 // Access static resources folders
 app.use('/img', express.static(path.join(__dirname, 'resources/img')));
 app.use('/icons', express.static(path.join(__dirname, 'resources/icons')));
 app.use('/templates', express.static(path.join(__dirname, 'resources/templates')));
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
+app.use(
+    '/staff',
+    requireLogin,
+    requireRoles(["staff"]),
+    express.static(path.join(__dirname, 'public/staff'))
+);
+
+app.use(
+    '/guest',
+    requireLogin,
+    requireRoles(["guest"]),
+    express.static(path.join(__dirname, 'public/guest'))
+);
+
+// Root route
+app.get('/', roleRedirect);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 const { initDatabase } = require("./src/db");
+app.use('/api/login', require('./src/db/routes/login'));
+app.use('/api/logout', require('./src/db/routes/logout'));
 app.use('/api/groups', require('./src/db/routes/groups'));
 
 initDatabase().then(() => {

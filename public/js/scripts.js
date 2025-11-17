@@ -35,10 +35,10 @@ function initHTML() {
             //         console.error(err);
             //     });
         }
-        
+
         if (window.innerWidth <= 1024) {
-            document.querySelectorAll('.dropdown-caret').forEach(function(caret) {
-                caret.addEventListener('click', function(e) {
+            document.querySelectorAll('.dropdown-caret').forEach(function (caret) {
+                caret.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var parent = caret.closest('.has-dropdown');
@@ -47,21 +47,21 @@ function initHTML() {
                     }
                 });
             });
-            
-            document.addEventListener('click', function(e) {
+
+            document.addEventListener('click', function (e) {
                 const navMenu = document.getElementById('navMenu');
                 const burger = document.getElementById('navbar-burger');
 
-                if (navMenu && navMenu.classList.contains('is-active') && 
-                    !e.target.closest('#navMenu') && 
+                if (navMenu && navMenu.classList.contains('is-active') &&
+                    !e.target.closest('#navMenu') &&
                     !e.target.closest('#navbar-burger')) {
-                    
+
                     navMenu.classList.remove('is-active');
                     if (burger) {
                         burger.classList.remove('is-active');
                     }
 
-                    document.querySelectorAll('.has-dropdown.is-active').forEach(function(dropdown) {
+                    document.querySelectorAll('.has-dropdown.is-active').forEach(function (dropdown) {
                         dropdown.classList.remove('is-active');
                     });
                 }
@@ -88,9 +88,15 @@ function initHTML() {
 }
 
 function logout() {
-    fetch('/api/logout', { method: 'POST' })
-        .then(res => res.json())
+    fetch('/api/logout', { method: 'POST', credentials: 'include' })
+        .then(res => {
+            if (!res.ok) throw new Error('Logout failed');
+            return res.json();
+        })
         .then(() => {
+            window.location.href = '/login.html?message=logout';
+        }).catch(err => {
+            console.error(err);
             window.location.href = '/login.html?message=logout';
         });
 }
@@ -129,9 +135,9 @@ function hideMessage() {
 }
 
 function debounce(func, delay = 300) {
-        let timer;
-        return function (...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}

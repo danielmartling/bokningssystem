@@ -1,3 +1,4 @@
+// src/db/models/GroupGroupType.js
 module.exports = (sequelize) => {
     const { DataTypes } = require("sequelize");
 
