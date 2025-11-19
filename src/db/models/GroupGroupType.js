@@ -8,6 +8,9 @@ module.exports = (sequelize) => {
             group_id: { type: DataTypes.INTEGER, allowNull: false },
             type_id: { type: DataTypes.INTEGER, allowNull: false }
         },
-        { timestamps: false }
+        {
+            timestamps: true,
+            paranoid: true
+        }
     );
 };

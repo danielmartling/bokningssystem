@@ -26,9 +26,33 @@ const UserRole = require("./models/UserRole")(sequelize);
 User.belongsToMany(Role, { through: UserRole, foreignKey: "user_id", otherKey: "role_id" });
 Role.belongsToMany(User, { through: UserRole, foreignKey: "role_id", otherKey: "user_id" });
 
+const Activity = require("./models/Activity")(sequelize);
+const ActivityTag = require("./models/ActivityTag")(sequelize);
+const ActivityCategory = require("./models/ActivityCategory")(sequelize);
 
+Activity.belongsTo(ActivityTag, { foreignKey: "tag_id" });
+ActivityTag.hasMany(Activity, { foreignKey: "tag_id" });
 
+Activity.belongsTo(ActivityCategory, { foreignKey: "category_id" });
+ActivityCategory.hasMany(Activity, { foreignKey: "category_id" });
 
+const ProgramDay = require("./models/ProgramDay")(sequelize);
+
+const Booking = require("./models/Booking")(sequelize);
+const BookingStatus = require("./models/BookingStatus")(sequelize);
+
+Booking.belongsTo(BookingStatus, { foreignKey: "status_id" });
+BookingStatus.hasMany(Booking, { foreignKey: "status_id" });
+
+Booking.belongsTo(Group, { foreignKey: "group_id" });
+Group.hasMany(Booking, { foreignKey: "group_id" })
+
+Booking.belongsTo(Activity, { foreignKey: "activity_id" });
+Activity.hasMany(Booking, { foreignKey: "activity_id" })
+
+const BookingTroop = require("./models/BookingTroop")(sequelize);
+Booking.belongsToMany(Troop, { through: BookingTroop, foreignKey: "booking_id", otherKey: "troop_id" });
+Troop.belongsToMany(Booking, { through: BookingTroop, foreignKey: "troop_id", otherKey: "booking_id" });
 
 
 
@@ -40,7 +64,7 @@ async function initDatabase() {
         await sequelize.authenticate();
         console.log("Database connected.");
 
-        await sequelize.sync({ alter: true });
+        await sequelize.sync();
         console.log("Models synced.");
 
         await seedAdminUser();

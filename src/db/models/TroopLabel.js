@@ -8,7 +8,10 @@ module.exports = (sequelize) => {
             label: { type: DataTypes.STRING },
             description: { type: DataTypes.STRING }
         },
-        { timestamps: false }
+        {
+            timestamps: true,
+            paranoid: true
+        }
     );
 
     TroopLabel.associate = (models) => {

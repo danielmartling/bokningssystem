@@ -10,10 +10,12 @@ module.exports = (sequelize) => {
             displayname: { type: DataTypes.STRING, allowNull: false },
             password_hash: { type: DataTypes.STRING, allowNull: false },
             active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-            create_time: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
             last_login: { type: DataTypes.DATE }
         },
-        { timestamps: false }
+        {
+            timestamps: true,
+            paranoid: true
+        }
     );
 
     User.associate = (models) => {

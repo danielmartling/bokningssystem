@@ -9,7 +9,10 @@ module.exports = (sequelize) => {
             role: { type: DataTypes.STRING, allowNull: false, unique: true },
             description: { type: DataTypes.STRING }
         },
-        { timestamps: false }
+        {
+            timestamps: true,
+            paranoid: true
+        }
     );
 
     Role.associate = (models) => {

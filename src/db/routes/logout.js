@@ -1,4 +1,4 @@
-// /src/routes/logout.js
+// src/routes/logout.js
  
 
 const express = require('express');

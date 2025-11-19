@@ -5,7 +5,11 @@ module.exports = (sequelize) => {
     const GroupType = sequelize.define(
         "group_type",
         { name: { type: DataTypes.STRING, allowNull: false } },
-        { timestamps: false });
+        {
+            timestamps: true,
+            paranoid: true
+        }
+    );
 
     GroupType.associate = (models) => {
         GroupType.belongsToMany(models.Group, {

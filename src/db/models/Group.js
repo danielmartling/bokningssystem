@@ -6,12 +6,15 @@ module.exports = (sequelize) => {
         "group",
         {
             group_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-            group_name: { type: DataTypes.STRING, allowNull: false },
+            name: { type: DataTypes.STRING, allowNull: false },
             booking_number: { type: DataTypes.INTEGER, allowNull: false, unique: true },
             arrival_date: { type: DataTypes.DATEONLY, allowNull: false },
             departure_date: { type: DataTypes.DATEONLY, allowNull: false }
         },
-        { timestamps: false }
+        {
+            timestamps: true,
+            paranoid: true
+        }
     );
 
     Group.associate = (models) => {
@@ -19,6 +22,7 @@ module.exports = (sequelize) => {
             through: models.GroupGroupType,
             foreignKey: "group_id",
         });
+        Group.hasMany(models.Booking, { foreignKey: "booking_id" });
     };
 
     return Group;
