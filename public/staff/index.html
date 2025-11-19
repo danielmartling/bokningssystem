@@ -19,25 +19,26 @@
     <!-- <script src="../js/groups.js"></script> -->
 </head>
 
+<style>
+    div.message-header>p.subtitle {
+        color: black !important;
+    }
+</style>
+
 <body class="has-navbar-fixed-top">
     <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
         aria-label="main navigation">
     </nav>
 
     <div class="container">
-        <div class="section" style="--bulma-section-padding: 3rem 0rem;">
-            <div class="container" id="notification-container"></div>
 
-            <div class="notification is-primary-staff" style="margin-bottom: 20px; border-radius: 20px;">
-                <div class="content">
-                    <h1 class="title">Program - Home</h1>
-                </div>
-                <div class="box">
-                    <div class="content">
-                        <p id="dayTitle" class="subtitle is-3"></p>
-                        <p id="dayMessage"></p>
-                    </div>
-                </div>
+        <div class="section" style="--bulma-section-padding: 3rem 0rem;">
+            <div class="content">
+                <div class="container" id="notification-container"></div>
+
+                <h1 class="title">Program - Home</h1>
+
+                <div id="programDayMessage"></div>
             </div>
 
             <div class="columns">
@@ -73,66 +74,77 @@
 
 <script>
 
-    let all = false;
+    const today = todayString();
 
-    document.getElementById("allToggle").addEventListener("click", () => {
-        document.getElementById("activitiesTable").innerHTML = "";
-        all = !all;
-        init();
-    })
     document.addEventListener('DOMContentLoaded', () => {
         initHTML();
-
         init();
     });
 
     async function init() {
-
-        const today = todayString();
-
-        const dayTitle = document.getElementById("dayTitle");
-        const dayMessage = document.getElementById("dayMessage");
-        [dayTitle.innerHTML, dayMessage.innerHTML] = await renderDayMessage(today);
-
-        groupsTodayList = document.getElementById("groupsTodayList");
-        groupsTodayList.innerHTML = await renderGroupsToday(today);
-
-        // bookingsToday = all ? await api.getTodaysBookings() : await api.getTodaysBookingsProgram();
-        bookingsToday = [];
-        activitiesTable = document.getElementById("activitiesTable");
-
-        // console.log(bookingsToday);
-
-        if (bookingsToday.length === 0) {
-            activitiesTable.innerHTML = `
-                <tr>
-                    <th colspan = "3"><i>No bookings today...</i></th>
-                </tr>
-            `;
-        } else {
-            bookingsToday.forEach(booking => {
-                activitiesTable.innerHTML += `
-                <tr>
-                    <th>${booking.activity_name}</th>
-                    <th>${booking.group_name}</th>
-                    <td>${renderShift(booking.shift)}</td>
-                </tr>
-            `;
-            })
-        }
-
+        await renderDayMessage();
+        await renderGroupsToday(today);
     }
 
-    // function renderShift(shift) {
-    //     switch (shift) { case 0: return "FM"; break; case 1: return "EM"; break; case 2: return "KV"; break; case 3: return "Natt"; break; };
-    // }
+    async function renderDayMessage() {
+        const programDayMessage = document.getElementById("programDayMessage");
+        const programDay = await api.getProgramDay(today);
+        const message = document.createElement("article");
+        message.classList.add("message", "is-primary-staff");
+        if (programDay) {
+            message.innerHTML = `
+                <div class="message-header">
+                    <p class="subtitle is-3" style="margin: 0px;">${today + ": " + programDay.title}</p>
+                    <button class="button" id="edit-btn"><span class="iconify" data-icon="mdi-edit"></span></button>
+                </div>
+                <div class="message-body" style="white-space: pre-wrap;">${programDay.message}</div>
+            `;
+        } else {
+            message.innerHTML = `
+                <div class="message-header">
+                    <p class="subtitle is-3" style="margin: 0px;">${today}</p>
+                    <button class="button" id="edit-btn"><span class="iconify" data-icon="mdi-edit"></span></button>
+                </div>
+                <div class="message-body"></div>
+            `;
+        };
+        programDayMessage.appendChild(message);
 
-    async function renderDayMessage(day) {
-        // Todo
-        return [todayString() + ":&nbsp;" + "Title of day eg. Miniscout day 4", "Important message of the day, eg. group arrives, need 25 tents."];
+        const editBtn = document.getElementById("edit-btn");
+        if (editBtn) editBtn.addEventListener("click", () => enterEditMode(message, programDay));
+    }
+
+    function enterEditMode(messageElement, programDay) {
+        const header = messageElement.querySelector(".message-header");
+        const body = messageElement.querySelector(".message-body");
+
+        header.innerHTML = `
+            <span style="min-width: 120px;">${today}:&nbsp;</span><input class="input" id="edit-title" value="${programDay ? programDay.title : ""}" placeholder="Program day title" />
+        `;
+
+        body.innerHTML = `
+            <textarea class="textarea" id="edit-message" placeholder="Program day message">${programDay ? programDay.message : ""}</textarea>
+
+            <div class="buttons" style="margin-top: 16px;">
+                <button class="button is-success" id="save-btn">Save</button>
+                <button class="button is-danger" id="cancel-btn">Cancel</button>
+            </div>
+        `;
+
+        document.getElementById("save-btn").addEventListener("click", async () => {
+            await api.saveProgramDay(today, document.getElementById("edit-title").value, document.getElementById("edit-message").value)
+            messageElement.remove();
+            renderDayMessage();
+        });
+
+        document.getElementById("cancel-btn").addEventListener("click", () => {
+            messageElement.remove();
+            renderDayMessage();
+        });
     }
 
     async function renderGroupsToday(day) {
+        groupsTodayList = document.getElementById("groupsTodayList");
         const groupsToday = await api.getGroupsByDay(day);
         let groupsArrivingHtml = "";
         let groupsStayingHtml = "";
@@ -142,23 +154,61 @@
             return `<i>No groups today...</i>`;
         } else {
             groupsToday
-                .sort((a, b) => a.group_name.localeCompare(b.group_name, "sv"))
+                .sort((a, b) => a.name.localeCompare(b.name, "sv"))
                 .forEach(group => {
                     if (group.arrival_date === day) {
-                        groupsArrivingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                        groupsArrivingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.name}</a></li>`;
                     } else if (group.departure_date === day) {
-                        groupsDepartingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                        groupsDepartingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.name}</a></li>`;
                     } else {
-                        groupsStayingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.group_name}</a></li>`;
+                        groupsStayingHtml += `<li><a href="/staff/groups/view.html?booking_number=${group.booking_number}">${group.name}</a></li>`;
                     }
                 });
             const groupsTodayHtml = `
             ${groupsArrivingHtml == "" ? "" : "<p class='subtitle is-5'>Arriving</p><ul>" + groupsArrivingHtml + "</ul>"}
             ${groupsStayingHtml == "" ? "" : "<p class='subtitle is-5'>Staying</p><ul>" + groupsStayingHtml + "</ul>"}
             ${groupsDepartingHtml == "" ? "" : "<p class='subtitle is-5'>Leaving</p><ul>" + groupsDepartingHtml + "</ul>"}`;
-            return groupsTodayHtml;
+            groupsTodayList.innerHTML = groupsTodayHtml;
         }
     }
+
+    // function renderShift(shift) {
+    //     switch (shift) { case 0: return "FM"; break; case 1: return "EM"; break; case 2: return "KV"; break; case 3: return "Natt"; break; };
+    // }
+
+
+    // function doStuff() {
+    //     document.getElementById("allToggle").addEventListener("click", () => {
+    //         document.getElementById("activitiesTable").innerHTML = "";
+    //         all = !all;
+    //         init();
+    //     })
+
+    //     // bookingsToday = all ? await api.getTodaysBookings() : await api.getTodaysBookingsProgram();
+    //     bookingsToday = [];
+    //     activitiesTable = document.getElementById("activitiesTable");
+
+    //     // console.log(bookingsToday);
+
+    //     if (bookingsToday.length === 0) {
+    //         activitiesTable.innerHTML = `
+    //             <tr>
+    //                 <th colspan = "3"><i>No bookings today...</i></th>
+    //             </tr>
+    //         `;
+    //     } else {
+    //         bookingsToday.forEach(booking => {
+    //             activitiesTable.innerHTML += `
+    //             <tr>
+    //                 <th>${booking.activity_name}</th>
+    //                 <th>${booking.group_name}</th>
+    //                 <td>${renderShift(booking.shift)}</td>
+    //             </tr>
+    //         `;
+    //         })
+    //     }
+    // }
+
 
 
 </script>

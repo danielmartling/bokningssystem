@@ -125,7 +125,11 @@ module.exports = {
     models: {
         Group, GroupType,
         Troop, TroopLabel,
-        User, Role
+        User, Role,
+        Activity, ActivityTag, ActivityCategory,
+        Booking, BookingStatus,
+        ProgramDay,
+
     },
     initDatabase,
 };

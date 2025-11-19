@@ -52,6 +52,7 @@ const { initDatabase } = require("./src/db");
 app.use('/api/login', require('./src/db/routes/login'));
 app.use('/api/logout', require('./src/db/routes/logout'));
 app.use('/api/groups', require('./src/db/routes/groups'));
+app.use('/api/programday', require('./src/db/routes/programDays'));
 
 initDatabase().then(() => {
     app.listen(process.env.PORT, (err) => {
