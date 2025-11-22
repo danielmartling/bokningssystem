@@ -84,11 +84,12 @@
               
                 <h1 id="utveckling">Utveckling</h1>
 <h2 id="mkdocs">Mkdocs</h2>
+<p>Används för att skapa dokumentationssidor (de här!).</p>
 <p><strong>För att förhandsvisa docs:</strong> Kör <code>mkdocs serve</code> i samma mapp som <code>mkdocs.yml</code> (<code>/src</code>). Öppna <code>http://127.0.0.1:8000/</code>.</p>
 <p><strong>För att bygga docs:</strong> Kör <code>mkdocs build</code> i samma mapp som <code>mkdocs.yml</code> (<code>/src</code>). Nu sparas docs-sidorna i mappen <code>/docs</code>.</p>
 <p><a href="https://www.mkdocs.org/getting-started/">Mer info om Mkcocs.</a></p>
 <h2 id="bulma">Bulma</h2>
-<p>Bulma används för lite gott och blandat. CSS-element, färger, teman, etc.</p>
+<p>Bulma används för lite gott och blandat. CSS-element, egna färger, teman, etc. </p>
 <p><strong>Ändra bulma:</strong> Redigera filen <code>/src/sass/main.scss</code>.</p>
 <p><strong>Bygg bulma:</strong> Görs ändringar måste bulma kompileras. Kör <code>npm run build-bulma</code> i <code>/</code>. Då uppdateras <code>/public/css/main.css</code>. Kom ihåg att inkludera den i html-filer (till exempel <code>&lt;link rel="stylesheet" href="css/main.css"&gt;</code>).</p>
 <p><a href="https://bulma.io/documentation/customize/with-sass/">Mer info om bulma.</a></p>
@@ -99,19 +100,19 @@ DB_USER=&quot;username&quot;
 DB_HOST=&quot;localhost&quot;
 DB_NAME=&quot;booking_dev&quot;
 DB_PASSWORD=&quot;password&quot;
-DB_PORT=&quot;5432&quot;
+DB_PORT=&quot;NNNN&quot;
 COOKIE_SECRET=&quot;password&quot;
-PORT=&quot;3000&quot;
+PORT=&quot;NNNN&quot;
 WEBAPP_ADMIN=&quot;username&quot;
 WEBAPP_ADMIN_PASSWORD=&quot;password&quot;
 </code></pre>
 <h2 id="databas-postgres-sequelize">Databas: Postgres + Sequelize</h2>
-<p>När <code>node server.js</code> så skapas alla databastabeller automatiskt om de inte finns. Det skapas även en administratörsanvändare vars användarnamn och lösenord definieras i <code>.env</code>.</p>
+<p>När <code>node server.js</code> körs så skapas alla databastabeller automatiskt om de inte finns. Det skapas även en administratörsanvändare vars användarnamn och lösenord definieras i <code>.env</code>.</p>
 <ul>
 <li>Databastabeller ("models") definieras i <code>src/db/models/</code>.</li>
-<li>Controllers bestämmer hur backenden interagerar med databasobjekten (<code>src/db/controllers/</code>).</li>
-<li>Routes låter användaren begära tillgång till databasobjekt (<code>src/db/routes/</code>). </li>
-<li>Till sist kallar användaren på databasobjekten från någon av metoderna i <code>public/js/api/</code>.</li>
+<li>Controllers definierar funktioner som kan skapa, läsa, redigera och radera databasobjekt (<code>src/db/controllers/</code>).</li>
+<li>Routes ger användaren tillgång till controllers (<code>src/db/routes/</code>). </li>
+<li>Till sist kallar användaren på databasobjekten från någon av funktionerna i <code>public/js/api/</code>.</li>
 </ul>
 <h2 id="npm-och-nodejs">NPM och node.js</h2>
 <p>Filen <code>package.json</code> innehåller dependencies som installeras med <code>npm install</code>. (Kräver <code>sudo apt install nodejs npm</code>). Starta webappen med <code>node server.js</code>.</p>
