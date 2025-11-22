@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="/icons/hollyrosa-square.png">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bokningssystem</title>
+    <title>Bokningssystem - Users</title>
 
     <link rel="stylesheet" href="/css/main.css">
 
@@ -13,18 +13,112 @@
     <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 
     <script type="module" src="/js/api/index.js"></script>
+    <script src="/js/scripts.js"></script>
 </head>
 
-<body>
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
+        aria-label="main navigation">
+    </nav>
+
     <div class="container">
         <div class="section">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li class="is-active"><a href="/staff/users/" aria-current="page">Users</a></li>
+                </ul>
+            </nav>
+
             <div class="content">
-                <p class="title is-1">Bokningssystem</p>
-                <p class="subtitle is-3">Program booking system</p>
+                <div class="container" id="notification-container"></div>
+                <p class="title is-1">Users</p>
+                <p class="subtitle is-3">List of all system users</p>
                 <p>
-                    Provisorisk sida.
+                    This is a list of all users, sorted by active/inactive -> staff/guest -> alphabetical.
                 </p>
+                <p>
+                    Only administrators can edit this list.
+                </p>
+            </div>
+
+            <div class="table-container">
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>User name</th>
+                            <th>Display name</th>
+                            <th>Roles</th>
+                            <th>Created</th>
+                            <th>Last login</th>
+                            <th>Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList"></tbody>
+                    <tfoot>
+                        <td colspan="6"></td>
+                        <td>
+                            <div class="buttons">
+                                <button class="button" onclick="userCreation()">
+                                    <span class="iconify" data-icon="mdi-add"></span>&nbsp;Create new user
+                                </button>
+                            </div>
+                        </td>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>
 </body>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initHTML();
+        init()
+    });
+
+    async function init() {
+        try {
+            const users = await api.getAllUsers();
+            const usersList = document.getElementById("usersList")
+            usersList.innerHTML =
+                users.length ?
+                    users
+                        .sort((a, b) => a.username.localeCompare(b.username, "sv"))
+                        .sort((a, b) => `${a.roles.map(role => role.role).includes("staff") ? 0 : 1}`.localeCompare(`${b.roles.map(role => role.role).includes("staff") ? 0 : 1}`, "sv"))
+                        .sort((a, b) => `${a.active ? 0 : 1}`.localeCompare(`${b.active ? 0 : 1}`))
+                        .map(user => `
+                            <tr>
+                                <th>${user.username}</th>
+                                <td>${user.displayname}</td>
+                                <td>${renderRoles(user.roles) || "<i>none</i>"}</td>
+                                <td>${new Date(user.createdAt).toLocaleString("se-sv")}</td>
+                                <td>${user.last_login ? new Date(user.last_login).toLocaleString("se-sv") : "<i>never</i>"}</td>
+                                <td><input type="checkbox" ${user.active ? "checked" : ""} disabled /></td>
+                                <td>
+                                    <div class="buttons">
+                                        <button class='button sort-icon' onclick="setState(${user.id})"><span class="iconify" data-icon="mdi-${user.active ? "sleep" : "sleep-off"}"></span></button>
+                                        <button class="button sort-icon" onclick="editUser(${user.id})"><span class="iconify" data-icon="mdi-pencil"></span></button>
+                                        <button class="button sort-icon" onclick="changePassword(${user.id})"><span class="iconify" data-icon="mdi-key-variant"></span></button>
+                                        <button class="button sort-icon" onclick="window.location='history.html?user=${user.id}'"><span class="iconify" data-icon="mdi-history"></span></button>
+                                    </div>
+                                </td>
+                            </tr>
+                    `).join("") :
+                    "<i>There are no users...</i>";
+        } catch (error) {
+            console.error("Oj nu blev det fel!", error);
+        }
+    }
+
+    function renderRoles(roles) {
+        if (!roles.length) return "<i>none</i>";
+        return `
+            <div class="tags">
+                ${roles.map(r => `<span class="tag is-${r.role}">${r.role}</span>`).join("")}
+            </div>
+        `;
+    }
+</script>

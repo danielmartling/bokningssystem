@@ -13,12 +13,13 @@
 
 import * as groups from "./groups.js";
 import * as programDays from "./programDays.js";
-
+import * as users from "./users.js";
 
 
 
 
 window.api = {
     ...groups,
-    ...programDays
+    ...programDays,
+    ...users
 };
