@@ -94,10 +94,10 @@
         if (programDay) {
             message.innerHTML = `
                 <div class="message-header">
-                    <p class="subtitle is-3" style="margin: 0px;">${today + ": " + programDay.title}</p>
-                    <button class="button" id="edit-btn"><span class="iconify" data-icon="mdi-edit"></span></button>
+                    <p class="subtitle is-3" style="margin: 0px;">${today}${(!programDay.title || programDay.title === "") ? "" : ":&nbsp;" + programDay.title}</p>
+                    <button class="button" id="edit-btn"><span class="iconify" data-icon="mdi-${programDay.title || programDay.message ? "edit" : "add"}"></span></button>
                 </div>
-                <div class="message-body" style="white-space: pre-wrap;">${programDay.message}</div>
+                <div class="message-body" style="white-space: pre-wrap;">${(!programDay.message || programDay.message === "") ? "<i>No daily message... Add one with the button above.</i>" : programDay.message}</div>
             `;
         } else {
             message.innerHTML = `

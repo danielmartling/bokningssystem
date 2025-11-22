@@ -4,6 +4,8 @@ const router = express.Router();
 const programDayController = require('../controllers/programDayController');
 const { requireLogin, requireRoles } = require('../../middleware/auth');
 
+
+// Will also create a Program Day if it does not exist
 router.get(
     "/byday/:day",
     requireLogin,

@@ -7,8 +7,8 @@ module.exports = (sequelize) => {
         {
             day_id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
             day: { type: DataTypes.DATEONLY, allowNull: false, unique: true },
-            title: { type: DataTypes.STRING },
-            message: { type: DataTypes.STRING }
+            title: { type: DataTypes.STRING, defaultValue: "" },
+            message: { type: DataTypes.STRING, defaultValue: "" }
         },
         {
             timestamps: true,
