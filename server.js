@@ -54,6 +54,7 @@ app.use('/api/logout', require('./src/db/routes/logout'));
 app.use('/api/groups', require('./src/db/routes/groups'));
 app.use('/api/programday', require('./src/db/routes/programDays'));
 app.use('/api/users', require('./src/db/routes/users'));
+app.use('/api/me', require('./src/db/routes/me'));
 
 initDatabase().then(() => {
     app.listen(process.env.PORT, (err) => {

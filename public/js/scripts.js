@@ -23,13 +23,17 @@ function initHTML() {
     $("#common-staff-navbar").load("/templates/nav_staff.html", function () {
         usernameDisplay = document.getElementById("username-display");
         if (usernameDisplay) {
+            api.getMe().then(me => {
+                usernameDisplay.innerHTML = `<span class="iconify navbar-icon" data-icon="mdi-user"></span>Me:<i>${me.displayname}</i>`;
+            });
+
             // fetch('/api/me')
             //     .then(res => {
             //         if (!res.ok) throw new Error("Not logged in");
             //         return res.json();
             //     })
             //     .then(user => {
-            //         usernameDisplay.innerHTML = `<span class="iconify navbar-icon" data-icon="mdi-user"></span>&nbsp;Me: <i>${user.displayname}</i>`;
+            //         usernameDisplay.innerHTML = `<span class="iconify navbar-icon" data-icon="mdi-user"></span>&nbsp;<i>${user.displayname}</i>`;
             //     })
             //     .catch(err => {
             //         console.error(err);

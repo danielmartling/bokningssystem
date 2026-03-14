@@ -44,26 +44,29 @@ router.post('/', async (req, res) => {
 
         await user.update({ last_login: new Date() });
 
+        const expire = 1000*60*60*24; // 24 hours
+
         res.cookie('roles',
             JSON.stringify(roles), {
             signed: true,
             httpOnly: true,
             sameSite: 'lax',
+            maxAge: expire,
         });
 
         res.cookie('userId', user.user_id, {
             signed: true,
             httpOnly: true,
             sameSite: 'lax',
+            maxAge: expire,
         });
 
         res.cookie('username', user.username, {
             signed: true,
             httpOnly: true,
             sameSite: 'lax',
+            maxAge: expire,
         });
-
-
 
         if (roles.includes("guest")) {
             const group = await Group.findOne({

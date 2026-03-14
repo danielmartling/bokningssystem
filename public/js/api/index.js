@@ -14,6 +14,8 @@
 import * as groups from "./groups.js";
 import * as programDays from "./programDays.js";
 import * as users from "./users.js";
+import * as me from "./me.js";
+import * as history from "./history.js";
 
 
 
@@ -21,5 +23,7 @@ import * as users from "./users.js";
 window.api = {
     ...groups,
     ...programDays,
-    ...users
+    ...users,
+    ...me,
+    ...history
 };

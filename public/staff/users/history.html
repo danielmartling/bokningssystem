@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang='en' data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bokningssystem - User history</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
+
+    <script src="/js/scripts.js"></script>
+    <script type="module" src="/js/api/index.js"></script>
+</head>
+
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
+        aria-label="main navigation"></nav>
+
+    <div class="container">
+        <div class="section">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="/staff/users/" aria-current="page">Users</a></li>
+                    <li class="is-active"><a href="/staff/users/history.html" aria-current="page">User history</a></li>
+                </ul>
+            </nav>
+
+            <div class="block">
+                <div class="container" id="notification-container"></div>
+                <h1 id="pagetitle" class="title">User history</h1>
+            </div>
+
+            <div class="table-container">
+                <table class="table is-striped is-fullwidth" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Event ID</th>
+                            <th>Table name</th>
+                            <th>Record ID</th>
+                            <th>Action</th>
+                            <th>Changes</th>
+                            <th>Performed by</th>
+                            <th>Performed at</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer" id="common-footer"></footer>
+
+</body>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initHTML();
+        init();
+    });
+
+    async function init() {
+        // const historyTable = document.getElementById("historyTable");
+
+        const userID = new URLSearchParams(window.location.search).get("user");
+        let history;
+
+        if (userID) {
+            history = await api.getHistoryOfUser(userID);
+        } else {
+            history = await api.getHistory();
+        }
+        // let tbody = "<tbody>";
+        // history.forEach(event => {
+        //     tbody += `
+        //         <tr>
+        //             <th>${event.event_id}</th>
+        //             <td>${event.table_name}</td>
+        //             <td>${event.record_id || ""}</td>
+        //             <td>${event.action}</td>
+        //             <td>${event.changes ? renderChanges(event.changes) : ""}</td>
+        //             <td>${event.performed_by}</td>
+        //             <td>${new Date(event.performed_at).toLocaleString("sv-SE")}</td>
+        //         </tr>
+        //     `;
+        // });
+        // tbody += "</tbody>";
+        // historyTable.innerHTML = tbody;
+    };
+
+    // function renderChanges(changes) {
+    //     console.log(changes);
+    //     if (changes.new) {
+    //         return changes.new;
+    //     }
+    // }
+
+
+</script>
+
+</html>

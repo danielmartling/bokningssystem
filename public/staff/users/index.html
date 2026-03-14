@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang='en' data-theme="light">
 
 <head>
     <meta charset="utf-8">
@@ -14,7 +14,27 @@
 
     <script type="module" src="/js/api/index.js"></script>
     <script src="/js/scripts.js"></script>
+    <script src="/js/users.js"></script>
+    <script src="/js/dateHelpers.js"></script>
 </head>
+
+<style>
+    .buttons,
+    .tags {
+        display: inline-flex;
+        gap: 0.25rem;
+        flex-wrap: nowrap;
+    }
+
+    td,
+    th {
+        vertical-align: middle !important;
+    }
+
+    th {
+        min-width: 150px;
+    }
+</style>
 
 <body class="has-navbar-fixed-top">
     <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
@@ -29,99 +49,400 @@
                     <li class="is-active"><a href="/staff/users/" aria-current="page">Users</a></li>
                 </ul>
             </nav>
-
             <div class="content">
                 <div class="container" id="notification-container"></div>
-                <p class="title is-1">Users</p>
-                <p class="subtitle is-3">List of all system users</p>
+                <p id="pagetitle" class="title">Users</p>
+                <p class="subtitle is-5">List of all system users</p>
                 <p>
                     This is a list of all users, sorted by active/inactive -> staff/guest -> alphabetical.
                 </p>
                 <p>
-                    Only administrators can edit this list.
+                    Only administrators can edit this list. To change your own password or display name, go to the <a
+                        href="./me.html">me page</a>.
                 </p>
             </div>
-
-            <div class="table-container">
-                <table class="table is-fullwidth is-striped is-hoverable">
-                    <thead>
-                        <tr>
-                            <th>User name</th>
-                            <th>Display name</th>
-                            <th>Roles</th>
-                            <th>Created</th>
-                            <th>Last login</th>
-                            <th>Active</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersList"></tbody>
-                    <tfoot>
-                        <td colspan="6"></td>
-                        <td>
+        </div>
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <tr>
+                        <th>User name</th>
+                        <th>Display name</th>
+                        <th>Roles</th>
+                        <th>Created</th>
+                        <th>Last login</th>
+                        <th style="min-width: 0px">Active</th>
+                        <th style="min-width: 0px">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersList"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7" style="text-align: right;">
                             <div class="buttons">
-                                <button class="button" onclick="userCreation()">
-                                    <span class="iconify" data-icon="mdi-add"></span>&nbsp;Create new user
+                                <button class="button" data-action="userCreation">
+                                    <span class="iconify" data-icon="mdi-account-plus"></span>&nbsp;Create new user
                                 </button>
                             </div>
                         </td>
-                    </tfoot>
-                </table>
-            </div>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 
+
+
     <footer class="footer" id="common-footer"></footer>
-    
+
 </body>
 
 
 <script>
+
+    let editingUserId = null;
+
+    let me;
+
     document.addEventListener('DOMContentLoaded', () => {
+
+        document.querySelector(".table-container")
+            .addEventListener("click", handleUserAction);
+
         initHTML();
         init()
+
     });
+
+
+    let userCreationState = false;
 
     async function init() {
         try {
+            me = await api.getMe();
             const users = await api.getAllUsers();
-            const usersList = document.getElementById("usersList")
-            usersList.innerHTML =
-                users.length ?
-                    users
-                        .sort((a, b) => a.username.localeCompare(b.username, "sv"))
-                        .sort((a, b) => `${a.roles.map(role => role.role).includes("staff") ? 0 : 1}`.localeCompare(`${b.roles.map(role => role.role).includes("staff") ? 0 : 1}`, "sv"))
-                        .sort((a, b) => `${a.active ? 0 : 1}`.localeCompare(`${b.active ? 0 : 1}`))
-                        .map(user => `
-                            <tr>
-                                <th>${user.username}</th>
-                                <td>${user.displayname}</td>
-                                <td>${renderRoles(user.roles) || "<i>none</i>"}</td>
-                                <td>${new Date(user.createdAt).toLocaleString("se-sv")}</td>
-                                <td>${user.last_login ? new Date(user.last_login).toLocaleString("se-sv") : "<i>never</i>"}</td>
-                                <td><input type="checkbox" ${user.active ? "checked" : ""} disabled /></td>
-                                <td>
-                                    <div class="buttons">
-                                        <button class='button sort-icon' onclick="setState(${user.id})"><span class="iconify" data-icon="mdi-${user.active ? "sleep" : "sleep-off"}"></span></button>
-                                        <button class="button sort-icon" onclick="editUser(${user.id})"><span class="iconify" data-icon="mdi-pencil"></span></button>
-                                        <button class="button sort-icon" onclick="changePassword(${user.id})"><span class="iconify" data-icon="mdi-key-variant"></span></button>
-                                        <button class="button sort-icon" onclick="window.location='history.html?user=${user.id}'"><span class="iconify" data-icon="mdi-history"></span></button>
-                                    </div>
-                                </td>
-                            </tr>
-                    `).join("") :
-                    "<i>There are no users...</i>";
+            const usersList = document.getElementById("usersList");
+
+            if (!users?.length) {
+                usersList.innerHTML = `<tr><td colspan='7'><i>There are no users...</i></td></tr>`;
+                return;
+            }
+
+            const sortedUsers = sortUsers(users);
+            usersList.innerHTML = sortedUsers.map(renderUserRow).join("");
         } catch (error) {
             console.error("Oj nu blev det fel!", error);
         }
     }
 
-    function renderRoles(roles) {
-        if (!roles.length) return "<i>none</i>";
+    function sortUsers(users) {
+        return users.sort((a, b) => {
+            if (a.active !== b.active) {
+                return b.active - a.active;
+            }
+
+            const aStaff = a.roles.some(r => r.role === "staff");
+            const bStaff = b.roles.some(r => r.role === "staff");
+
+            if (aStaff !== bStaff) {
+                return bStaff - aStaff;
+            }
+
+            return a.username.localeCompare(b.username, "sv");
+        })
+    }
+
+
+
+    function renderUserRow(user) {
+
+        const editing = (editingUserId === user.user_id);
+        const editingSelf = (user.user_id === me.user_id)
+        if (editing) {
+            console.log(editingSelf)
+        }
+
         return `
-            <div class="tags">
-                ${roles.map(r => `<span class="tag is-${r.role}">${r.role}</span>`).join("")}
+            <tr data-user="${user.user_id}">
+
+                <th>
+                    ${editing
+                ? `<input type="text" class="input is-small" id="username-${user.user_id}" value="${user.username}" required>`
+                : user.username}
+                </th>
+
+                <td>
+                    ${editing
+                ? `<input type="text" class="input is-small" id="displayname-${user.user_id}" value="${user.displayname}" required>`
+                : user.displayname}
+                </td>
+
+                <td>
+                    ${editing
+                ? renderRolesEditor(user)
+                : renderRoles(user.roles)}
+                </td>
+
+                <td>${renderDate(user.createdAt)}</td>
+
+                <td>${user.last_login ? renderDate(user.last_login) : "<i>never</i>"}</td>
+
+                <td style="text-align: center;">
+                    <input type="checkbox" id="active-${user.user_id}" ${user.active ? "checked" : ""} ${!editing || editingSelf ? "disabled" : ""} />
+                </td>
+
+                <td style="text-align: left;">
+                    ${editing ? renderEditButtons(user) : renderNormalButtons(user, editingSelf)}
+                </td>
+            </tr>
+            `;
+    }
+
+    function renderEditButtons(user) {
+        return `
+            <div class="buttons has-addons is-centered">
+                <button title="Save user" class="button is-small is-success" 
+                    data-action="saveUser"
+                    data-user="${user.user_id}">
+                    <span class="iconify" data-icon="mdi-content-save"></span>
+                </button>
+                <button title="Cancel edit" class="button is-small is-danger" 
+                    data-action="cancelEdit">
+                    <span class="iconify" data-icon="mdi-close"></span>
+                </button>
             </div>
         `;
     }
+
+    function renderNormalButtons(user, editingSelf) {
+        return `
+            <div class="buttons has-addons is-centered">
+                <button title="Edit user" class="button is-small"
+                    data-action="edit"
+                    data-user="${user.user_id}"
+                    ${editingSelf ? "disabled" : ""}>
+                    <span class="iconify" data-icon="mdi-pencil"></span>
+                </button>
+                <button title="Change password of user" class="button is-small" 
+                    data-action="togglePassword"
+                    data-user="${user.user_id}"
+                    ${editingSelf ? "disabled" : ""}>
+                    <span class="iconify" data-icon="mdi-key-variant"></span>
+                </button>
+                <button title="See history of user" class="button is-small" 
+                    data-action="history"
+                    data-user="${user.user_id}">
+                    <span class="iconify" data-icon="mdi-history"></span>
+                </button>
+            </div>
+        `;
+    }
+
+    function editUser(id) {
+        editingUserId = id;
+        init();
+    }
+
+    function cancelEdit() {
+        editingUserId = null;
+        init();
+    }
+
+    async function saveUser(id) {
+
+        const username = document.getElementById(`username-${id}`).value;
+        const displayname = document.getElementById(`displayname-${id}`).value;
+        const active = document.getElementById(`active-${id}`).checked;
+
+        const roles = [...document.querySelectorAll(
+            `tr[data-user="${id}"] #input-roles input:checked`
+        )].map(cb => cb.value);
+
+        if (username === "" || displayname === "") {
+            showWarning("Username or displayname can not be empty!");
+            return;
+        }
+
+        await api.updateUser(id, {
+            username,
+            displayname,
+            active,
+            roles
+        });
+
+        editingUserId = null;
+        showSuccess("User updated!")
+        init();
+    }
+
+    function togglePasswordRow(id) {
+        const existing = document.getElementById(`pw-row-${id}`);
+        if (existing) {
+            existing.remove();
+            return;
+        }
+
+        document.querySelectorAll("tr[id^='pw-row-']").forEach(row => row.remove());
+
+        const row = document.querySelector(`tr[data-user="${id}"]`);
+        if (!row) return;
+
+        const pwRow = document.createElement("tr");
+        pwRow.id = `pw-row-${id}`;
+        pwRow.innerHTML = `
+            <td colspan="7">
+                <div class="is-flex" style="justify-content: right; gap: 15px;">
+                    <span class="tag">Change password:&nbsp;</span>
+                    <input class="input is-small" type="password" style="max-width: 150px;"
+                        id="pw1-${id}" placeholder="New password">
+                    <input class="input is-small" type="password" style="max-width: 150px;"
+                        id="pw2-${id}" placeholder="Repeat password">
+
+                    <div class="buttons has-addons is-centered">
+                        <button title="Save new password" class="button is-success is-small"
+                            data-action="savePassword"
+                            data-user="${id}">
+                            <span class="iconify" data-icon="mdi-content-save"></span>
+                        </button>
+                        <button title="Cancel password edit" class="button is-danger is-small"
+                            onclick="document.getElementById('pw-row-${id}').remove();">
+                            <span class="iconify" data-icon="mdi-close"></span>
+                        </button>
+                    </div>
+                </div>
+            </td>
+    `;
+        row.after(pwRow);
+    }
+
+    function renderRoleCheckbox(role, userRoles, disabled = false) {
+        return `
+            <div class="tag">
+                <label class="checkbox">
+                    <input type="checkbox"
+                        class="role-checkbox"
+                        value="${role}"
+                        ${userRoles.includes(role) ? "checked" : ""}
+                        ${disabled ? "disabled" : ""}>
+                    ${role}
+                </label>
+            </div>
+        `;
+    }
+    function renderRolesEditor(user) {
+
+        const roles = user.roles.map(r => r.role);
+
+        let html = `<div class="checkboxes" id="input-roles">`;
+
+        roleConfig.base.forEach(role => {
+
+            const disabled = role === "guest" && roles.includes("guest");
+
+            html += renderRoleCheckbox(role, roles, disabled);
+        });
+
+        if (roles.includes("staff")) {
+            roleConfig.staff.forEach(role => {
+                html += renderRoleCheckbox(role, roles);
+            });
+        }
+
+        roleConfig.system.forEach(role => {
+            if (roles.includes(role)) {
+                html += renderRoleCheckbox(role, roles, true);
+            }
+        });
+
+        html += `</div>`;
+
+        return html;
+    }
+
+    async function savePassword(id) {
+
+        const pw1 = document.getElementById(`pw1-${id}`).value;
+        const pw2 = document.getElementById(`pw2-${id}`).value;
+
+        if (pw1 === "" || pw2 === "") {
+            showWarning("Passwords can not be empty!");
+            return;
+        }
+        if (pw1 !== pw2) {
+            showWarning("Passwords do not match!");
+            return;
+        }
+
+        await api.changePassword(id, pw1);
+
+        document.getElementById(`pw-row-${id}`).remove();
+        showSuccess("Password changed!");
+    }
+
+    function userCreation() {
+
+    }
+
+    function handleUserAction(event) {
+
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const action = button.dataset.action;
+        const userId = Number(button.dataset.user);
+
+        switch (action) {
+
+            case "edit":
+                editUser(userId);
+                break;
+
+            case "history":
+                window.location = `history.html?user=${userId}`;
+                break;
+
+            case "togglePassword":
+                togglePasswordRow(userId);
+                break;
+
+            case "saveUser":
+                saveUser(userId);
+                break;
+
+            case "cancelEdit":
+                cancelEdit();
+                break;
+
+            case "savePassword":
+                savePassword(userId);
+                break;
+
+            case "userCreation":
+                userCreation();
+                break;
+        }
+
+
+        const checkbox = event.target.closest("#input-roles input[type=checkbox]");
+        if (checkbox) {
+            if (checkbox.value === "staff") {
+                const row = checkbox.closest("tr");
+                const userId = row.dataset.user;
+
+                const roles = [...row.querySelectorAll("#input-roles input:checked")]
+                    .map(cb => cb.value);
+
+                const user = {
+                    user_id: userId,
+                    username: row.querySelector(`#username-${userId}`)?.value,
+                    displayname: row.querySelector(`#displayname-${userId}`)?.value,
+                    roles: roles.map(r => ({ role: r })),
+                    active: document.querySelector(`#active-${userId}`).checked
+                };
+
+                row.outerHTML = renderUserRow(user);
+            }
+        }
+    }
+
 </script>

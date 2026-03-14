@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang='en' data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bokningssystem - Me</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
+
+    <script src="/js/scripts.js"></script>
+    <script src="/js/users.js"></script>
+    <script src="/js/dateHelpers.js"></script>
+    <script type="module" src="/js/api/index.js"></script>
+</head>
+
+<style>
+    .table thead th,
+    .table tbody th,
+    .table tbody td {
+        vertical-align: middle;
+    }
+</style>
+
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
+        aria-label="main navigation">
+    </nav>
+
+    <div class="container">
+        <div class="section">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="/staff/users/" aria-current="page">Users</a></li>
+                    <li class="is-active"><a href="/staff/users/me.html" aria-current="page">Me</a></li>
+                </ul>
+            </nav>
+
+            <div class="container" id="notification-container"></div>
+
+            <div class="content">
+                <p id="pagetitle" class="title">Me</p>
+                <p class="subtitle is-5">Information about the current user</p>
+                <p>Here you can change your display name and reset your password. An administrator can change your
+                    username and assign roles.</p>
+            </div>
+
+            <div class="columns is-desktop">
+                <div class="column">
+                    <!-- Information about the current user -->
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-striped is-hoverable is-narrow">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th colspan="2">
+                                        <input type="text" class="input is-static" data-field="username"
+                                            placeholder="Username" readonly>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Displayname</td>
+                                    <td>
+                                        <input type="text" class="input is-static is-small" data-field="displayname"
+                                            placeholder="Displayname" readonly>
+                                    </td>
+                                    <td>
+                                        <div class="buttons is-right is-flex-nowrap has-addons">
+                                            <button title="Edit displayname" class="button is-small" id="editDisplaynameButton">
+                                                <span class="iconify navbar-icon" data-icon="mdi-pencil"></span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Roles</td>
+                                    <td>
+                                        <div class="tags" data-field="roles"></div>
+                                    </td>
+                                    <td>
+                                        <div class="buttons is-right">
+                                            <a title="About user roles" class="button is-small" href="./roles.html">
+                                                <span class="iconify navbar-icon" data-icon="mdi-help"></span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>User ID</td>
+                                    <td colspan="2">
+                                        <input type="text" class="input is-static is-small" data-field="user_id"
+                                            placeholder="User ID" readonly>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>User active</td>
+                                    <td colspan="2">
+                                        <input type="checkbox" data-field="active" disabled is-small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>User created</td>
+                                    <td colspan="2">
+                                        <input type="text" data-field="createdAt" class="input is-static is-small" readonly>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Last login</td>
+                                    <td colspan="2">
+                                        <input type="text" data-field="last_login" class="input is-static is-small" readonly>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="column">
+                    <!-- CHANGE PASSWORD -->
+                    <div class="box">
+                        <p class="subtitle is-5">Change password</p>
+                        <div class="table-container">
+                            <table class="table is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Current password:</td>
+                                        <td>
+                                            <input id="input-oldPassword" type="password" class="input editable-input is-small"
+                                                placeholder="****" required>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>New password:</td>
+                                        <td>
+                                            <input id="input-newPassword" type="password" class="input editable-input is-small"
+                                                placeholder="****" required>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Repeat new password:</td>
+                                        <td>
+                                            <input id="input-repeatPassword" type="password"
+                                                class="input editable-input is-small" placeholder="****" required>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="buttons is-right is-flex-nowrap has-addons" is-right">
+                                                <button title="Save new password" class="button is-small is-success"
+                                                    id="changePasswordButton"><span class="iconify"
+                                                        data-icon="mdi-content-save"></span></button>
+                                                <button title="Cancel new password" class="button is-small is-danger"
+                                                    onclick="cancelPassword()"><span class="iconify"
+                                                        data-icon="mdi-close"></span></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- RECENT HISTORY -->
+            <div class="box">
+                <p class="subtitle is-5">
+                    Recent history
+                </p>
+                <table class="table is-fullwidth is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Action</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3"><i>No actions so far...</i></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" style="text-align: right;">
+                                <a title="Complete history" class="button is-small" href="./history.html?user=">
+                                    <span class="iconify navbar-icon" data-icon="mdi-history"></span>
+                                    &nbsp;
+                                    <span>Complete history</span>
+                                </a>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer" id="common-footer"></footer>
+
+</body>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        title = document.getElementById("pagetitle")
+        initHTML();
+        init();
+
+
+    });
+
+    async function init() {
+        try {
+            const me = await api.getMe();
+
+            renderTable(me);
+            setupHandlers(me);
+
+        } catch (error) {
+            console.error("Oj nu blev det fel!", error);
+            title.textContent = "User not found!";
+        }
+    };
+
+    function renderTable(data) {
+
+        document.querySelectorAll("[data-field]").forEach(el => {
+
+            const field = el.dataset.field;
+            const value = data[field];
+
+            if (value == null) return;
+
+            if (el.type === "checkbox") {
+                el.checked = value;
+                return;
+            }
+
+            else if (field === "createdAt" || field === "last_login") {
+                el.value = renderDate(value);
+                return;
+            }
+
+            else if (field === "roles") {
+                el.innerHTML = renderRoles(data.roles);
+                return;
+            }
+
+            else {
+                el.value = value;
+            }
+
+        });
+    }
+
+    function setupHandlers(me) {
+
+        document
+            .getElementById("editDisplaynameButton")
+            .addEventListener("click", enableDisplaynameEdit);
+
+        document
+            .getElementById("changePasswordButton")
+            .addEventListener("click", () => changePassword(me.id));
+
+    }
+
+    function enableDisplaynameEdit() {
+
+        const input = document.querySelector('[data-field="displayname"]');
+        const buttonCell = document.getElementById("editDisplaynameButton").parentElement;
+
+        originalDisplayName = input.value;
+
+        input.removeAttribute("readonly");
+        input.classList.remove("is-static");
+        input.focus();
+
+        buttonCell.innerHTML = `
+            <div class="buttons is-right is-flex-nowrap has-addons">
+                <button class="button is-small is-success" id="saveDisplaynameButton">
+                    <span class="iconify" data-icon="mdi-content-save"></span>
+                </button>
+                <button class="button is-small is-danger" id="cancelDisplaynameButton">
+                    <span class="iconify" data-icon="mdi-close"></span>
+                </button>
+            </div>
+        `;
+
+        document
+            .getElementById("saveDisplaynameButton")
+            .addEventListener("click", saveDisplayname);
+
+        document
+            .getElementById("cancelDisplaynameButton")
+            .addEventListener("click", cancelDisplaynameEdit);
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") saveDisplayname();
+            if (e.key === "Escape") cancelDisplaynameEdit();
+        });
+    }
+
+    async function saveDisplayname() {
+
+        try {
+
+            const input = document.querySelector('[data-field="displayname"]');
+            const newDisplayName = input.value.trim();
+
+            if (!newDisplayName) {
+                showWarning("Display name cannot be empty");
+                return;
+            }
+
+            await api.updateDisplayname(newDisplayName);
+
+            document.getElementById("pagetitle").textContent = newDisplayName;
+
+            finishDisplaynameEdit();
+
+            showSuccess("Display name updated");
+
+        } catch (err) {
+            showWarning(err.message);
+        }
+    }
+
+    function cancelDisplaynameEdit() {
+
+        const input = document.querySelector('[data-field="displayname"]');
+
+        input.value = originalDisplayName;
+
+        finishDisplaynameEdit();
+    }
+
+    function finishDisplaynameEdit() {
+
+        const input = document.querySelector('[data-field="displayname"]');
+        const buttonCell = document.getElementById("saveDisplaynameButton").parentElement.parentElement;
+
+        input.setAttribute("readonly", true);
+        input.classList.add("is-static");
+
+        buttonCell.innerHTML = `
+            <button class="button is-small" id="editDisplaynameButton">
+                <span class="iconify navbar-icon" data-icon="mdi-pencil"></span>
+            </button>
+    `;
+
+        document
+            .getElementById("editDisplaynameButton")
+            .addEventListener("click", enableDisplaynameEdit);
+    }
+
+    async function changePassword(id) {
+        try {
+
+            const oldPassword = document.getElementById("input-oldPassword").value.trim();
+            const newPassword = document.getElementById("input-newPassword").value.trim();
+            const confirmPassword = document.getElementById("input-repeatPassword").value.trim();
+
+            if (oldPassword == "" || newPassword == "" || confirmPassword == "") {
+                showWarning("Passwords can't be empty!");
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showWarning("The passwords have to be identical!");
+                return;
+            }
+
+            if (newPassword === oldPassword) {
+                showWarning("The new password can not be the same as the old one!");
+                return;
+            }
+
+            await api.updatePassword(oldPassword, newPassword);
+            showSuccess(`You have a new password!`);
+            cancelPassword();
+        } catch (error) {
+            showWarning("Unexpected error: " + error.message);
+        }
+    }
+
+    function cancelPassword() {
+        const oldPassword = document.getElementById("input-oldPassword");
+        const newPassword = document.getElementById("input-newPassword");
+        const repeatPassword = document.getElementById("input-repeatPassword");
+
+        oldPassword.value = "";
+        newPassword.value = "";
+        repeatPassword.value = "";
+    }
+
+
+
+
+</script>
+
+</html>

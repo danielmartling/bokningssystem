@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang='en' data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bokningssystem - User history</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
+
+    <script type="module" src="/js/api/index.js"></script>
+    <script src="/js/scripts.js"></script>
+    <script src="/js/users.js"></script>
+</head>
+
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation" aria-label="main navigation">
+    </nav>
+
+    <div id="watermark"></div>
+
+    <div class="container">
+        <div class="section">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="/staff/users/" aria-current="page">Users</a></li>
+                    <li class="is-active"><a href="/staff/users/roles.html" aria-current="page">User roles</a></li>
+                </ul>
+            </nav>
+
+            <div class="block">
+                <div class="container" id="notification-container"></div>
+                <h1 id="pagetitle" class="title">User roles</h1>
+            </div>
+
+            <div class="content">
+                <p>
+                    This is a matrix explaining the different user roles in the system, and what the user of a certain
+                    role can do.
+                </p>
+                <p><i>db*</i> = Can only be done in database.</p>
+                <p>There is also a 'fladan' role that just changes the home page to '/staff/fladan/'.</p>
+            </div>
+
+            <div class="box">
+                <div class="columns">
+                    <div class="column is-narrow">
+                        My roles are:
+                    </div>
+                    <div id="roleCell" class="column is-narrow"></div>
+                </div>
+            </div>
+
+            <div class="container" id="notification-container"></div>
+
+            <div class="table-container">
+                <table class="table is-striped is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>guest</th>
+                            <th>staff</th>
+                            <th>program-viewer</th>
+                            <th>program-jour</th>
+                            <th>program-booker</th>
+                            <th>program-admin</th>
+                            <th>system-admin</th>
+                        </tr>
+                    </thead>
+                    <tbody style="text-align: center;">
+                        <tr>
+                            <th>View users</th>
+                            <td><i>only self</i></td>
+                            <td>X</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Add users</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Edit user info</th>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Assign user roles</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>(De)activate user</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Change passwords</th>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td><i>only own</i></td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Delete users</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>db*</i></td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>guest</th>
+                            <th>staff</th>
+                            <th>program-viewer</th>
+                            <th>program-jour</th>
+                            <th>program-booker</th>
+                            <th>program-admin</th>
+                            <th>system-admin</th>
+                        </tr>
+                        <tr>
+                            <th>View groups</th>
+                            <td><i>TODO</i></td>
+                            <td>X</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Edit groups</th>
+                            <td><i>TODO</i></td>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                        </tr>
+                        <tr>
+                            <th>Add groups</th>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Delete groups</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>db*</i></td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>guest</th>
+                            <th>staff</th>
+                            <th>program-viewer</th>
+                            <th>program-jour</th>
+                            <th>program-booker</th>
+                            <th>program-admin</th>
+                            <th>system-admin</th>
+                        </tr>
+                        <tr>
+                            <th>View bookings</th>
+                            <td><i>TODO</i></td>
+                            <td>X</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Edit bookings</th>
+                            <td><i>TODO</i></td>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                        </tr>
+                        <tr>
+                            <th>Add bookings</th>
+                            <td><i>TODO</i></td>
+                            <td><i>-</i></td>
+                            <td><i>-</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                        </tr>
+                        <tr>
+                            <th>Delete bookings</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>db*</i></td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th>guest</th>
+                            <th>staff</th>
+                            <th>program-viewer</th>
+                            <th>program-jour</th>
+                            <th>program-booker</th>
+                            <th>program-admin</th>
+                            <th>system-admin</th>
+                        </tr>
+                        <tr>
+                            <th>View activities</th>
+                            <td>X</td>
+                            <td>X</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>X</td>
+                        </tr>
+                        <tr>
+                            <th>Edit activities</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                        </tr>
+                        <tr>
+                            <th>Add activities</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>TODO</i></td>
+                            <td><i>TODO</i></td>
+                        </tr>
+                        <tr>
+                            <th>Delete activities</th>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td><i>db*</i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="footer" id="common-footer"></footer>
+
+</body>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initHTML();
+
+        init();
+
+    });
+
+
+    function init() {
+        try {
+            fetch('/api/me')
+                .then(res => {
+                    if (!res.ok) throw new Error("Not logged in");
+                    return res.json();
+                })
+                .then(me => {
+                    roleCell = document.getElementById("roleCell");
+                    roleCell.innerHTML += renderRoles(me.roles) || "<i>none...</i>";
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        } catch (error) {
+            console.error("Oj nu blev det fel!", error);
+            title.textContent = "User not found!";
+        }
+    };
+
+    // function renderRoles(user) {
+    //     let roles = user.roles;
+    //     let html = '<span class="tags">';
+    //     if (roles) {
+    //         roles.forEach(role => {
+    //             html += `<span class="tag is-info">${role.role}</span>`
+    //         });
+    //     }
+    //     html += '</span>'
+    //     return html;
+    // }
+</script>
+
+</html>
