@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const { models } = require("../index");
 const User = models.User;
 const Role = models.Role;
+const Permission = models.Permission;
 const Group = models.Group;
 
 router.post('/', async (req, res) => {
@@ -18,10 +19,16 @@ router.post('/', async (req, res) => {
             where: {
                 username: username.trim().toLowerCase()
             },
-            include: [{
-                model: Role,
-                attributes: ["role"]
-            }]
+            include: [
+                {
+                    model: Role,
+                    attributes: ["role"]
+                },
+                {
+                    model: Permission,
+                    attributes: ["permission"]
+                }
+            ]
         });
 
         if (!user) {
@@ -42,12 +49,25 @@ router.post('/', async (req, res) => {
             return res.status(401).json({ error: 'User has no roles!' });
         }
 
+        const permissions = user.permissions.map(r => r.permission);
+        // if (permissions.length === 0) {
+        //     return res.status(401).json({ error: 'User has no permissions!' });
+        // }
+
         await user.update({ last_login: new Date() });
 
-        const expire = 1000*60*60*24; // 24 hours
+        const expire = 1000 * 60 * 60 * 24; // 24 hours
 
         res.cookie('roles',
             JSON.stringify(roles), {
+            signed: true,
+            httpOnly: true,
+            sameSite: 'lax',
+            maxAge: expire,
+        });
+
+        res.cookie('permissions',
+            JSON.stringify(permissions), {
             signed: true,
             httpOnly: true,
             sameSite: 'lax',

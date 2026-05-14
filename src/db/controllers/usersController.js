@@ -2,6 +2,7 @@
 const { models } = require("../index");
 const User = models.User;
 const Role = models.Role;
+const Permission = models.Permission;
 const { Op } = require("sequelize");
 const bcrypt = require('bcrypt');
 
@@ -10,8 +11,13 @@ async function getAllUsers(req, res) {
     const users = await User.findAll({
         include: [
             {
-                model: models.Role,
+                model: Role,
                 attributes: ["role"],
+                through: { attributes: [] }
+            },
+            {
+                model: Permission,
+                attributes: ["permission"],
                 through: { attributes: [] }
             }
         ]
@@ -62,7 +68,7 @@ async function updateUser(req, res) {
                 role: req.body.roles
             }
         });
-        
+
         await user.setRoles(roles);
     }
 

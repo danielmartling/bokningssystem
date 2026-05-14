@@ -33,4 +33,30 @@ function requireRoles(roles) {
     };
 }
 
-module.exports = { requireLogin, requireRoles };
+function requirePermissions(permissions) {
+    return (req, res, next) => {
+        const userId = req.signedCookies.userId;
+        let userPermissions = [];
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Not logged in' });
+        }
+
+        try {
+            userPermissions = JSON.parse(req.signedCookies.permissions || "[]");
+        } catch (error) {
+            console.error("Invalid roles cookie", error);
+            return res.status(400).json({ error: 'Invalid roles data' });
+        }
+
+        const hasPermission = permissions.some(permission => userPermissions.includes(permission));
+
+        if (!hasPermission) {
+            return res.status(403).json({ error: 'Forbidden: insufficient permission' });
+        }
+
+        next();
+    };
+}
+
+module.exports = { requireLogin, requireRoles, requirePermissions };

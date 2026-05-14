@@ -26,7 +26,7 @@
 </style>
 
 <body class="has-navbar-fixed-top">
-    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary" role="navigation"
         aria-label="main navigation">
     </nav>
 
@@ -41,7 +41,7 @@
                 <div id="programDayMessage"></div>
             </div>
 
-            <!-- <div class="columns">
+            <div class="columns">
                 <div class="column is-two-thirds">
                     <div class="box">
                         <div class="content">
@@ -64,7 +64,7 @@
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
     </div>
 
@@ -91,7 +91,7 @@
         const programDayMessage = document.getElementById("programDayMessage");
         const programDay = await api.getProgramDay(today);
         const message = document.createElement("article");
-        message.classList.add("message", "is-primary-staff");
+        message.classList.add("message", "is-primary");
         if (programDay) {
             message.innerHTML = `
                 <div class="message-header">

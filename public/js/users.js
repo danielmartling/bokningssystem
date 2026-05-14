@@ -8,6 +8,15 @@ function renderRoles(roles) {
     `;
 }
 
+function renderPermissions(permissions) {
+    if (!permissions?.length) return "<i>none</i>";
+    return `
+        <div class="tags">
+            ${permissions.map(r => `<span class="tag is-${r.permission}">${r.permission}</span>`).join("")}
+        </div>
+    `;
+}
+
 const roleConfig = {
     base: ["guest", "staff"],
     staff: [

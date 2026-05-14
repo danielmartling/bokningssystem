@@ -16,7 +16,7 @@ import * as programDays from "./programDays.js";
 import * as users from "./users.js";
 import * as me from "./me.js";
 import * as history from "./history.js";
-
+import * as activities from "./activities.js"
 
 
 
@@ -25,5 +25,6 @@ window.api = {
     ...programDays,
     ...users,
     ...me,
-    ...history
+    ...history,
+    ...activities
 };

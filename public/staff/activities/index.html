@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <link rel="icon" type="image/x-icon" href="/icons/hollyrosa-square.png">
+    <link rel="icon" type="image/x-icon" href="/icons/Scoutsymbolen_rgb.png">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bokningssystem</title>
+    <title>Bokningssystem - Activities</title>
 
     <link rel="stylesheet" href="/css/main.css">
 
@@ -13,18 +13,120 @@
     <script src="//code.iconify.design/1/1.0.6/iconify.min.js"></script>
 
     <script type="module" src="/js/api/index.js"></script>
+    <script src="/js/scripts.js"></script>
 </head>
 
-<body>
+<style>
+    summary {
+        font-size: large;
+        font-weight: bold;
+    }
+</style>
+
+<body class="has-navbar-fixed-top">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
+    </nav>
+
     <div class="container">
         <div class="section">
+
+            <nav class="breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li class="is-active"><a href="/staff/activities/" aria-current="page">Activities</a></li>
+                </ul>
+            </nav>
             <div class="content">
-                <p class="title is-1">Bokningssystem</p>
-                <p class="subtitle is-3">Program booking system</p>
+                <div class="container" id="notification-container"></div>
+                <p id="pagetitle" class="title">Activities</p>
+                <p class="subtitle is-5">List of all program actvities</p>
                 <p>
-                    Provisorisk sida.
+                    This is a list of all activities, grouped by category.
                 </p>
             </div>
         </div>
+        <div class="table-container">
+            <table class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                    <!-- <tr>
+                        <th>Category</th>
+                        <th>Title</th>
+                        <th>Subtitle</th>
+                        <th>Description - Short</th>
+                        <th>Description - Guest</th>
+                        <th>Description - Staff</th>
+                        <th>Material</th>
+                        <th>Place</th>
+                        <th>Languages</th>
+                    </tr> -->
+                </thead>
+                <tbody id="activityList"></tbody>
+                <tfoot></tfoot>
+            </table>
+        </div>
+
     </div>
+
+
+
+    <footer class="footer" id="common-footer"></footer>
 </body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initHTML();
+        init();
+    });
+
+    async function init() {
+        const activities = await api.getActivitiesByCategory();
+        activities.sort(function (a, b) { return a.order - b.order })
+        const activityList = document.getElementById("activityList");
+        activityList.innerHTML = activities.map(renderCategory).join("");
+    };
+
+    function renderActivity(activity) {
+        return `
+            <tr data-activity="${activity.activity_id}">
+                <th style="width: 25%">
+                    ${activity.title}
+                </th>
+                <td style="width: 25%">
+                    ${activity.subtitle || ""}
+                </td>
+                <td style="width: 50%">
+                    ${activity.desc_short || ""}
+                </td>
+            </tr>
+            `;
+    };
+
+    function renderCategory(category) {
+        return `
+            <tr>
+                <td colspan="9">
+                    <details open>
+                        <summary>
+                            ${category.name}
+                        </summary>
+                        <table class="table is-fullwidth is-striped is-hoverable" style="margin-left: 25px;">
+                            <thead style="display: none">
+                                <tr>
+                                    <th>Title</th>
+                                    <th style="width: 25%">Subtitle</th>
+                                    <th style="width: 50%">Description - Short</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${category.activities
+                                    .sort((a, b) => a.title.localeCompare(b.title, "sv", { ignorePunctuation: true }))    
+                                    .map(renderActivity).join("")}
+                            </tbody>
+                            <tfoot></tfoot>
+                        </table>
+                    </details
+                </td>
+            </tr>
+        `;
+
+    }
+</script>

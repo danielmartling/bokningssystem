@@ -37,8 +37,7 @@
 </style>
 
 <body class="has-navbar-fixed-top">
-    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary-staff" role="navigation"
-        aria-label="main navigation">
+    <nav id="common-staff-navbar" class="navbar is-fixed-top is-primary" role="navigation" aria-label="main navigation">
     </nav>
 
     <div class="container">
@@ -68,7 +67,8 @@
                     <tr>
                         <th>User name</th>
                         <th>Display name</th>
-                        <th>Roles</th>
+                        <th>Role</th>
+                        <th>Permissions</th>
                         <th>Created</th>
                         <th>Last login</th>
                         <th style="min-width: 0px">Active</th>
@@ -78,7 +78,7 @@
                 <tbody id="usersList"></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="7" style="text-align: right;">
+                        <td colspan="8" style="text-align: right;">
                             <div class="buttons">
                                 <button class="button" data-action="userCreation">
                                     <span class="iconify" data-icon="mdi-account-plus"></span>&nbsp;Create new user
@@ -183,6 +183,12 @@
                 : renderRoles(user.roles)}
                 </td>
 
+                <td>
+                    ${editing
+                ? renderRolesEditor(user)
+                : renderPermissions(user.permissions)}
+                </td>
+
                 <td>${renderDate(user.createdAt)}</td>
 
                 <td>${user.last_login ? renderDate(user.last_login) : "<i>never</i>"}</td>
@@ -203,7 +209,7 @@
             <div class="buttons has-addons is-centered">
                 <button title="Save user" class="button is-small is-success" 
                     data-action="saveUser"
-                    data-user="${user.user_id}">
+                    data-user="${user ? user.user_id : "new-user"}">
                     <span class="iconify" data-icon="mdi-content-save"></span>
                 </button>
                 <button title="Cancel edit" class="button is-small is-danger" 
@@ -254,9 +260,20 @@
         const displayname = document.getElementById(`displayname-${id}`).value;
         const active = document.getElementById(`active-${id}`).checked;
 
-        const roles = [...document.querySelectorAll(
-            `tr[data-user="${id}"] #input-roles input:checked`
+        const row = document.querySelector(`tr[data-user="${id}"]`);
+
+        const baseRole = row.querySelector(
+            `input[type="radio"]:checked`
+        ).value;
+
+        const staffRoles = [...row.querySelectorAll(
+            `.staff-role-checkbox:checked`
         )].map(cb => cb.value);
+
+        const roles = [
+            baseRole,
+            ...(baseRole === "staff" ? staffRoles : [])
+        ];
 
         if (username === "" || displayname === "") {
             showWarning("Username or displayname can not be empty!");
@@ -329,32 +346,63 @@
             </div>
         `;
     }
+
     function renderRolesEditor(user) {
 
-        const roles = user.roles.map(r => r.role);
+        const roles = user
+            ? user.roles.map(r => r.role)
+            : [];
 
-        let html = `<div class="checkboxes" id="input-roles">`;
+        const isStaff = roles.includes("staff");
 
-        roleConfig.base.forEach(role => {
+        let html = `
+        <div class="roles-editor">
 
-            const disabled = role === "guest" && roles.includes("guest");
+            <div class="field">
+                <label class="radio">
+                    <input
+                        type="radio"
+                        name="base-role-${user?.user_id || "new"}"
+                        value="guest"
+                        ${!isStaff ? "checked" : ""}
+                    >
+                    Guest
+                </label>
 
-            html += renderRoleCheckbox(role, roles, disabled);
+                <label class="radio ml-3">
+                    <input
+                        type="radio"
+                        name="base-role-${user?.user_id || "new"}"
+                        value="staff"
+                        ${isStaff ? "checked" : ""}
+                    >
+                    Staff
+                </label>
+            </div>
+
+            <div class="staff-roles mt-2">
+    `;
+
+        roleConfig.staff.forEach(role => {
+
+            html += `
+            <label class="checkbox mr-3">
+                <input
+                    type="checkbox"
+                    class="staff-role-checkbox"
+                    value="${role}"
+                    ${roles.includes(role) ? "checked" : ""}
+                    ${!isStaff ? "disabled" : ""}
+                >
+                ${role}
+            </label>
+        `;
         });
 
-        if (roles.includes("staff")) {
-            roleConfig.staff.forEach(role => {
-                html += renderRoleCheckbox(role, roles);
-            });
-        }
-
-        roleConfig.system.forEach(role => {
-            if (roles.includes(role)) {
-                html += renderRoleCheckbox(role, roles, true);
-            }
-        });
-
-        html += `</div>`;
+        html += `
+            </div>
+        </div>
+    `;
 
         return html;
     }
@@ -380,7 +428,42 @@
     }
 
     function userCreation() {
+        const existing = document.getElementById(`new-user-row`);
+        if (existing) {
+            existing.remove();
+            return;
+        }
 
+        document.querySelectorAll("tr[id^='pw-row-']").forEach(row => row.remove());
+
+        const newRow = document.createElement("tr");
+        newRow.id = `new-user-row`;
+        newRow.innerHTML = `
+            <th>
+                <input type="text" class="input is-small" id="username-new-user" placeholder="New username" required>
+            </th>
+
+            <td>
+                <input type="text" class="input is-small" id="displayname-new-user" placeholder="New displayname" required>
+            </td>
+
+            <td>
+                ${renderRolesEditor()}
+            </td>
+
+            <td></td>
+
+            <td></td>
+
+            <td style="text-align: center;">
+                <input type="checkbox" id="active-new-user"  />
+            </td>
+
+            <td style="text-align: left;">
+                ${renderEditButtons()}
+            </td>
+        `;
+        document.getElementById("usersList").append(newRow);
     }
 
     function handleUserAction(event) {
@@ -442,6 +525,28 @@
 
                 row.outerHTML = renderUserRow(user);
             }
+        }
+
+        const radio = event.target.closest('input[type="radio"]');
+
+        if (radio) {
+
+            const row = radio.closest("tr");
+
+            const isStaff = radio.value === "staff";
+
+            const checkboxes = row.querySelectorAll(
+                ".staff-role-checkbox"
+            );
+
+            checkboxes.forEach(cb => {
+
+                cb.disabled = !isStaff;
+
+                if (!isStaff) {
+                    cb.checked = false;
+                }
+            });
         }
     }
 

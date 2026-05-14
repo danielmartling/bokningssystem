@@ -23,6 +23,10 @@ module.exports = (sequelize) => {
             through: models.UserRole,
             foreignKey: "user_id",
         });
+        User.belongsToMany(models.Permission, {
+            through: models.UserPermission,
+            foreignKey: "permission_id",
+        });
     };
 
     return User;

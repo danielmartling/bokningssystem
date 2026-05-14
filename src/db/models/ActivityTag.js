@@ -15,7 +15,7 @@ module.exports = (sequelize) => {
     );
 
     ActivityTag.associate = (models) => {
-        ActivityTag.hasMany(models.Activity, { foreignKey: "activity_id" });
+        ActivityTag.hasMany(models.Activity, { foreignKey: "tag_id" });
     };
 
     return ActivityTag;

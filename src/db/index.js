@@ -20,11 +20,18 @@ Group.belongsToMany(GroupType, { through: GroupGroupType, foreignKey: "group_id"
 GroupType.belongsToMany(Group, { through: GroupGroupType, foreignKey: "type_id", otherKey: "group_id" });
 
 const User = require("./models/User")(sequelize);
+
 const Role = require("./models/Role")(sequelize);
 const UserRole = require("./models/UserRole")(sequelize);
 
+const Permission = require("./models/Permission")(sequelize);
+const UserPermission = require("./models/UserPermission")(sequelize);
+
 User.belongsToMany(Role, { through: UserRole, foreignKey: "user_id", otherKey: "role_id" });
 Role.belongsToMany(User, { through: UserRole, foreignKey: "role_id", otherKey: "user_id" });
+
+User.belongsToMany(Permission, { through: UserPermission, foreignKey: "user_id", otherKey: "permission_id" });
+Permission.belongsToMany(User, { through: UserPermission, foreignKey: "permission_id", otherKey: "user_id" });
 
 const Activity = require("./models/Activity")(sequelize);
 const ActivityTag = require("./models/ActivityTag")(sequelize);
@@ -78,15 +85,6 @@ async function seedAdminUser() {
     const adminUsername = process.env.WEBAPP_ADMIN;
     const adminPassword = process.env.WEBAPP_ADMIN_PASSWORD;
 
-    let adminRole = await Role.findOne({ where: { role: "system-admin" } });
-    if (!adminRole) {
-        adminRole = await Role.create({
-            role: "system-admin",
-            description: "Super administrator"
-        });
-        console.log("Admin role created.");
-    }
-
     let staffRole = await Role.findOne({ where: { role: "staff" } });
     if (!staffRole) {
         staffRole = await Role.create({
@@ -94,6 +92,15 @@ async function seedAdminUser() {
             description: "Role for staff members"
         });
         console.log("Staff role created.");
+    }
+
+    let adminPermission = await Permission.findOne({ where: { permission: "system-admin" } });
+    if (!adminPermission) {
+        adminPermission = await Permission.create({
+            permission: "system-admin",
+            description: "Super administrator"
+        });
+        console.log("Admin permission created.");
     }
 
     let adminUser = await User.findOne({ where: { username: adminUsername } });
@@ -109,13 +116,17 @@ async function seedAdminUser() {
     }
 
     const roles = await adminUser.getRoles();
-    if (!roles.some(r => r.role === "system-admin")) {
-        await adminUser.addRole(adminRole);
-        console.log("Admin role assigned to admin user.");
-    }
+    
     if (!roles.some(r => r.role === "staff")) {
         await adminUser.addRole(staffRole);
         console.log("Staff role assigned to admin user.");
+    }
+
+    const permissions = await adminUser.getPermissions();
+
+    if (!permissions.some(r => r.permission === "system-admin")) {
+        await adminUser.addRole(adminPermission);
+        console.log("Admin permission assigned to admin user.");
     }
 }
 
@@ -125,7 +136,7 @@ module.exports = {
     models: {
         Group, GroupType,
         Troop, TroopLabel,
-        User, Role,
+        User, Role, Permission,
         Activity, ActivityTag, ActivityCategory,
         Booking, BookingStatus,
         ProgramDay,

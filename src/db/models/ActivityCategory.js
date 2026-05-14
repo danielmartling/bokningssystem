@@ -16,7 +16,7 @@ module.exports = (sequelize) => {
     );
 
     ActivityCategory.associate = (models) => {
-        ActivityCategory.hasMany(models.Activity, { foreignKey: "activity_id" });
+        ActivityCategory.hasMany(models.Activity, { foreignKey: "category_id" });
     };
 
     return ActivityCategory;
